@@ -7,3 +7,4 @@ export * from './types';
 export * from './levelService';
 export * from './progressService';
 export * from './masteryService';
+export * from './guestProfileService';

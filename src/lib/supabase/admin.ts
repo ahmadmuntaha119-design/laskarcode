@@ -6,6 +6,8 @@
  * Dokumen Acuan: docs/LaskarCode_Vibe_Coding_Acuan_v1.0.md §20, §22.3
  */
 
+import 'server-only';
+
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
