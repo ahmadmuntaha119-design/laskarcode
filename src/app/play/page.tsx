@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { resolveGuestSession } from "@/lib/session/resolveSession";
 import { GuestProfileService } from "@/services/guestProfileService";
 import { LevelService } from "@/services/levelService";
+import { ProgressService } from "@/services/progressService";
+import type { PlayerProgressDTO } from "@/services/types";
 import { LevelPlayer } from "@/components/game/LevelPlayer";
 import { PlayerHeader } from "@/components/game/PlayerHeader";
 import { AlertTriangle, RefreshCw, Loader2 } from "lucide-react";
@@ -84,10 +86,19 @@ async function PlayPageContent() {
     );
   }
 
+  // 3.5 Ambil riwayat progress pemain dari Supabase untuk pemulihan (Persistence Restoration)
+  const progressService = new ProgressService();
+  let playerProgress: PlayerProgressDTO[] = [];
+  try {
+    playerProgress = await progressService.getPlayerProgress(session, profile.id);
+  } catch (err: unknown) {
+    console.warn("Gagal memuat player progress dari database:", err);
+  }
+
   return (
     <>
       <PlayerHeader profile={profile} levelCount={levels.length} />
-      <LevelPlayer initialLevelCode="1.1" />
+      <LevelPlayer initialLevelCode="1.1" initialProgress={playerProgress} />
     </>
   );
 }

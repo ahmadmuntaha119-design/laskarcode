@@ -4,6 +4,7 @@ import {
   computeLevelSummary,
   isLevelUnlocked,
   type LevelProgress,
+  type LevelRecordStatus,
   type LevelStatusSummary,
 } from "./progression";
 import type { LevelDefinition } from "./types";
@@ -18,6 +19,14 @@ export type ProgressionState = {
   getLevelSummary: (code: string) => LevelStatusSummary | null;
   getNextLevelCode: (currentCode: string) => string | null;
   resetProgress: () => void;
+  syncProgressFromDatabase: (
+    items: readonly {
+      levelCode?: string;
+      status: LevelRecordStatus;
+      stars: number;
+      bestAttempts?: number;
+    }[]
+  ) => void;
 };
 
 const INITIAL_PROGRESS: Record<string, LevelProgress> = {
@@ -106,6 +115,22 @@ export const useProgressionStore = create<ProgressionState>((set, get) => ({
     set({
       activeLevelCode: "1.1",
       progress: INITIAL_PROGRESS,
+    });
+  },
+
+  syncProgressFromDatabase: (items) => {
+    set((state) => {
+      const updated = { ...state.progress };
+      for (const item of items) {
+        if (item.levelCode) {
+          updated[item.levelCode] = {
+            status: item.status,
+            stars: item.stars,
+            bestAttempts: item.bestAttempts,
+          };
+        }
+      }
+      return { progress: updated };
     });
   },
 }));

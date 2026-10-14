@@ -45,13 +45,18 @@ export class ProgressService {
     if (this.client) return this.client;
 
     try {
-      const { createClient } = await import('@/lib/supabase/server');
-      return await createClient();
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : String(err);
-      throw new ConfigurationError(
-        `Klien database tidak dapat diinisialisasi: ${message}`
-      );
+      const { createAdminClient } = await import('@/lib/supabase/admin');
+      return createAdminClient();
+    } catch {
+      try {
+        const { createClient } = await import('@/lib/supabase/server');
+        return await createClient();
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err);
+        throw new ConfigurationError(
+          `Klien database tidak dapat diinisialisasi: ${message}`
+        );
+      }
     }
   }
 
@@ -240,5 +245,94 @@ export class ProgressService {
       completedAt: data.completed_at,
       updatedAt: data.updated_at,
     };
+  }
+
+  /**
+   * Mengambil data progress untuk satu level spesifik.
+   */
+  async getSingleLevelProgress(
+    auth: AuthContext,
+    profileId: string,
+    levelId: string
+  ): Promise<PlayerProgressDTO | null> {
+    assertAuthorized(auth, profileId);
+
+    const supabase = await this.getClient();
+
+    const { data, error } = (await supabase
+      .from('level_progress')
+      .select(`
+        id,
+        profile_id,
+        level_id,
+        status,
+        stars,
+        best_attempts,
+        best_time_ms,
+        completed_at,
+        updated_at,
+        levels (
+          code
+        )
+      `)
+      .eq('profile_id', profileId)
+      .eq('level_id', levelId)
+      .maybeSingle()) as unknown as {
+      data: ProgressQueryRow | null;
+      error: { message: string } | null;
+    };
+
+    if (error) {
+      throw new DatabaseOperationError(
+        `Gagal mengambil data progress untuk level '${levelId}': ${error.message}`,
+        error
+      );
+    }
+
+    if (!data) return null;
+
+    return {
+      id: data.id,
+      profileId: data.profile_id,
+      levelId: data.level_id,
+      levelCode: data.levels?.code,
+      status: data.status,
+      stars: data.stars,
+      bestAttempts: data.best_attempts,
+      bestTimeMs: data.best_time_ms,
+      completedAt: data.completed_at,
+      updatedAt: data.updated_at,
+    };
+  }
+
+  /**
+   * Menghitung total percobaan sebelumnya untuk profil dan level tertentu.
+   */
+  async getAttemptCount(
+    auth: AuthContext,
+    profileId: string,
+    levelId: string
+  ): Promise<number> {
+    assertAuthorized(auth, profileId);
+
+    const supabase = await this.getClient();
+
+    const { count, error } = (await supabase
+      .from('level_attempts')
+      .select('*', { count: 'exact', head: true })
+      .eq('profile_id', profileId)
+      .eq('level_id', levelId)) as unknown as {
+      count: number | null;
+      error: { message: string } | null;
+    };
+
+    if (error) {
+      throw new DatabaseOperationError(
+        `Gagal menghitung jumlah percobaan attempt: ${error.message}`,
+        error
+      );
+    }
+
+    return count ?? 0;
   }
 }

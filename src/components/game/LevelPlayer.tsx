@@ -19,11 +19,13 @@ import { BlocklyWorkspace } from "./BlocklyWorkspace";
 import { GameControls } from "./GameControls";
 import { FeedbackBanner } from "./FeedbackBanner";
 import { LevelSelector } from "./LevelSelector";
+import type { PlayerProgressDTO } from "@/services/types";
 
 export type LevelPlayerProps = {
   initialLevelCode?: string;
   levelConfig?: LevelConfig;
   className?: string;
+  initialProgress?: PlayerProgressDTO[];
 };
 
 type LevelPlaySessionProps = {
@@ -47,8 +49,12 @@ function LevelPlaySession({
   const [status, setStatus] = useState<ControllerStatus>("IDLE");
   const [renderOptions, setRenderOptions] = useState<RenderOptions>({});
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [saveNotice, setSaveNotice] = useState<string | null>(null);
+  const [verifiedStars, setVerifiedStars] = useState<number | null>(null);
   const [actionsExecuted, setActionsExecuted] = useState(0);
   const [collisions, setCollisions] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const isSubmittingRef = useRef(false);
 
   // Setup controller callbacks
   useEffect(() => {
@@ -70,9 +76,6 @@ function LevelPlaySession({
 
         if (stepResult.executionState === "SUCCESS" || stepResult.executionState === "FAILED") {
           setStatus(stepResult.executionState);
-          if (stepResult.executionState === "SUCCESS" && levelDef) {
-            completeLevel(levelDef.code, 1);
-          }
         }
       },
       onComplete: (gameResult) => {
@@ -83,24 +86,24 @@ function LevelPlaySession({
           ...prev,
           isGoal: gameResult.status === "SUCCESS",
         }));
-        if (gameResult.status === "SUCCESS" && levelDef) {
-          completeLevel(levelDef.code, 1);
-        }
       },
       onReset: (initialState) => {
         setBotiState({ ...initialState });
         setStatus("IDLE");
         setRenderOptions({});
         setErrorMessage(null);
+        setSaveNotice(null);
+        setVerifiedStars(null);
         setActionsExecuted(0);
         setCollisions(0);
+        isSubmittingRef.current = false;
       },
     });
 
     return () => {
       controller.cancelExecution();
     };
-  }, [controller, levelDef, completeLevel]);
+  }, [controller]);
 
   const handleWorkspaceReady = useCallback((workspace: Blockly.WorkspaceSvg) => {
     workspaceRef.current = workspace;
@@ -113,6 +116,10 @@ function LevelPlaySession({
   }, [errorMessage]);
 
   const handleRun = useCallback(async () => {
+    if (status === "RUNNING" || isSubmitting) {
+      return;
+    }
+
     const workspace = workspaceRef.current;
     if (!workspace) {
       setErrorMessage("Workspace belum siap.");
@@ -120,6 +127,8 @@ function LevelPlaySession({
     }
 
     setErrorMessage(null);
+    setSaveNotice(null);
+    setVerifiedStars(null);
 
     // 1. Parse Blockly Workspace using BlocklyParser
     const parseResult = BlocklyParser.parseWorkspace(workspace, {
@@ -136,16 +145,53 @@ function LevelPlaySession({
     try {
       setStatus("RUNNING");
       setRenderOptions({});
+      isSubmittingRef.current = false;
+      const startTime = Date.now();
+
       await controller.run(parseResult.actions, { stepDelayMs: 450 });
+
+      // 3. Setelah eksekusi selesai, kirim ke Server Action untuk verifikasi objektif & persistensi
+      if (!isSubmittingRef.current && levelDef) {
+        isSubmittingRef.current = true;
+        setIsSubmitting(true);
+        const durationMs = Date.now() - startTime;
+
+        try {
+          const { submitGameplayAttemptAction } = await import("@/app/actions/gameplayActions");
+          const res = await submitGameplayAttemptAction({
+            levelCode: levelDef.code,
+            actions: parseResult.actions,
+            durationMs,
+            startedAt: new Date(startTime).toISOString(),
+          });
+
+          if (res.success && res.verifiedResult) {
+            if (res.verifiedResult.successful) {
+              setVerifiedStars(res.verifiedResult.stars);
+              completeLevel(levelDef.code, res.verifiedResult.stars);
+            }
+          } else if (!res.success) {
+            setSaveNotice(res.error ?? "Progres belum dapat tersimpan ke server.");
+          }
+        } catch {
+          setSaveNotice("Kendala jaringan: Progres belum tersimpan ke server.");
+        } finally {
+          setIsSubmitting(false);
+        }
+      }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Terjadi kesalahan saat menjalankan program.";
       setErrorMessage(msg);
       setStatus("FAILED");
     }
-  }, [controller, activeLevel.availableBlocks]);
+  }, [controller, activeLevel.availableBlocks, levelDef, completeLevel, status, isSubmitting]);
 
   const handleReset = useCallback(() => {
+    isSubmittingRef.current = true;
     controller.reset();
+    setStatus("IDLE");
+    setErrorMessage(null);
+    setSaveNotice(null);
   }, [controller]);
 
   return (
@@ -173,6 +219,8 @@ function LevelPlaySession({
           errorMessage={errorMessage}
           collisions={collisions}
           isGoal={renderOptions.isGoal}
+          verifiedStars={verifiedStars}
+          saveNotice={saveNotice}
         />
 
         {/* Next Level Progression Banner */}
@@ -229,6 +277,7 @@ function LevelPlaySession({
           onReset={handleReset}
           actionsExecuted={actionsExecuted}
           maxActions={activeLevel.maxActions}
+          disabled={isSubmitting}
         />
       </section>
     </div>
@@ -239,9 +288,16 @@ export function LevelPlayer({
   initialLevelCode = "1.1",
   levelConfig: customConfig,
   className = "",
+  initialProgress,
 }: LevelPlayerProps) {
-  const { activeLevelCode, setActiveLevelCode } = useProgressionStore();
+  const { activeLevelCode, setActiveLevelCode, syncProgressFromDatabase } = useProgressionStore();
   const [showSelector, setShowSelector] = useState(false);
+
+  useEffect(() => {
+    if (initialProgress && initialProgress.length > 0) {
+      syncProgressFromDatabase(initialProgress);
+    }
+  }, [initialProgress, syncProgressFromDatabase]);
 
   // Active level determination: priority customConfig -> activeLevelCode -> fallback 1.1
   const activeLevel: LevelDefinition | LevelConfig = useMemo(() => {

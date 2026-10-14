@@ -9,6 +9,8 @@ export type FeedbackBannerProps = {
   errorMessage?: string | null;
   collisions?: number;
   isGoal?: boolean;
+  verifiedStars?: number | null;
+  saveNotice?: string | null;
 };
 
 export function FeedbackBanner({
@@ -16,6 +18,8 @@ export function FeedbackBanner({
   errorMessage,
   collisions = 0,
   isGoal = false,
+  verifiedStars = null,
+  saveNotice = null,
 }: FeedbackBannerProps) {
   if (errorMessage) {
     return (
@@ -31,34 +35,55 @@ export function FeedbackBanner({
 
   if (status === "SUCCESS" || isGoal) {
     return (
-      <div className="flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-900 shadow-sm animate-in zoom-in-95">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white shadow">
-          <Sparkles className="h-6 w-6" />
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-900 shadow-sm animate-in zoom-in-95">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white shadow">
+            <Sparkles className="h-6 w-6" />
+          </div>
+          <div>
+            <h4 className="font-bold text-emerald-800">🎉 Hore! Misi Berhasil!</h4>
+            <p className="text-sm text-emerald-700">
+              Boti berhasil sampai ke bintang target dengan selamat!
+            </p>
+            {verifiedStars !== null && verifiedStars > 0 && (
+              <p className="text-xs font-bold text-amber-600 mt-1">
+                ⭐ {verifiedStars} Bintang Diperoleh!
+              </p>
+            )}
+          </div>
         </div>
-        <div>
-          <h4 className="font-bold text-emerald-800">🎉 Hore! Misi Berhasil!</h4>
-          <p className="text-sm text-emerald-700">
-            Boti berhasil sampai ke bintang target dengan selamat!
-          </p>
-        </div>
+        {saveNotice && (
+          <div className="text-xs font-semibold text-rose-700 bg-rose-50 border border-rose-200 rounded-lg px-3 py-1.5 flex items-center gap-1.5">
+            <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+            <span>{saveNotice}</span>
+          </div>
+        )}
       </div>
     );
   }
 
   if (status === "FAILED") {
     return (
-      <div className="flex items-center gap-3 rounded-xl border border-rose-200 bg-rose-50 p-4 text-rose-900 shadow-sm animate-in fade-in">
-        <AlertTriangle className="h-6 w-6 shrink-0 text-rose-600" />
-        <div>
-          <h4 className="font-bold text-rose-800">
-            {collisions > 0 ? "💥 Boti Menabrak Batas!" : "Belum Sampai Target"}
-          </h4>
-          <p className="text-sm text-rose-700">
-            {collisions > 0
-              ? "Boti menabrak tembok grid. Coba periksa kembali jumlah langkah Maju yang disusun!"
-              : "Boti belum mencapai bintang. Tambahkan lebih banyak langkah untuk sampai!"}
-          </p>
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-3 rounded-xl border border-rose-200 bg-rose-50 p-4 text-rose-900 shadow-sm animate-in fade-in">
+          <AlertTriangle className="h-6 w-6 shrink-0 text-rose-600" />
+          <div>
+            <h4 className="font-bold text-rose-800">
+              {collisions > 0 ? "💥 Boti Menabrak Batas!" : "Belum Sampai Target"}
+            </h4>
+            <p className="text-sm text-rose-700">
+              {collisions > 0
+                ? "Boti menabrak tembok grid. Coba periksa kembali jumlah langkah Maju yang disusun!"
+                : "Boti belum mencapai bintang. Tambahkan lebih banyak langkah untuk sampai!"}
+            </p>
+          </div>
         </div>
+        {saveNotice && (
+          <div className="text-xs font-semibold text-rose-700 bg-rose-50 border border-rose-200 rounded-lg px-3 py-1.5 flex items-center gap-1.5">
+            <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+            <span>{saveNotice}</span>
+          </div>
+        )}
       </div>
     );
   }

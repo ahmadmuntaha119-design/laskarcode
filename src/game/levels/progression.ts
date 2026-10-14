@@ -90,3 +90,30 @@ export function computeLevelSummary(
     stars: record.stars,
   };
 }
+
+/**
+ * Menghitung perolehan bintang permainan secara objektif:
+ * - 0 Bintang: Tidak berhasil mencapai target.
+ * - 1 Bintang: Berhasil mencapai goal target.
+ * - 2 Bintang: Berhasil tanpa collision (menabrak rintangan atau batas grid).
+ * - 3 Bintang: Berhasil tanpa collision dan dengan langkah yang efisien (<= 75% maxActions).
+ */
+export function calculateStars(
+  successful: boolean,
+  actionsUsed: number,
+  collisions: number,
+  maxActions: number
+): number {
+  if (!successful) return 0;
+
+  let stars = 1;
+  if (collisions === 0) {
+    stars += 1;
+  }
+  if (collisions === 0 && actionsUsed <= Math.ceil(maxActions * 0.75)) {
+    stars += 1;
+  }
+
+  return Math.min(3, Math.max(1, stars));
+}
+

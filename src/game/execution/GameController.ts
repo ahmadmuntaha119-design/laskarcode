@@ -71,6 +71,9 @@ export class GameController {
    */
   public cancelExecution(): void {
     this.isCancelled = true;
+    if (this.status === "RUNNING") {
+      this.status = "IDLE";
+    }
     if (this.activeTimerId !== null) {
       clearTimeout(this.activeTimerId);
       this.activeTimerId = null;
