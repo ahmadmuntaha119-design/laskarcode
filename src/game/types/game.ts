@@ -5,10 +5,12 @@ export type Position = {
 
 export type Direction = "NORTH" | "EAST" | "SOUTH" | "WEST";
 
-export type BotiState = {
+export type CipiState = {
   position: Position;
   direction: Direction;
 };
+
+export type BotiState = CipiState;
 
 export type GameAction = "MOVE" | "TURN_LEFT" | "TURN_RIGHT";
 

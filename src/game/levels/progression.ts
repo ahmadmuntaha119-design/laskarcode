@@ -146,14 +146,14 @@ export type IslandProgressSummary = {
 
 /**
  * Determines whether an island is unlocked based on prerequisites.
- * Island 1 (Desa Boti) is always unlocked.
+ * Island 1 (Desa Cipi / Desa Boti) is always unlocked.
  * Island 2 (Hutan Pola) requires Level 1.6 to be COMPLETED.
  */
 export function isIslandUnlocked(
   islandSlug: string,
   progressMap: Record<string, LevelProgress>
 ): boolean {
-  if (islandSlug === "desa-boti") {
+  if (islandSlug === "desa-boti" || islandSlug === "desa-cipi") {
     return true;
   }
   if (islandSlug === "hutan-pola") {

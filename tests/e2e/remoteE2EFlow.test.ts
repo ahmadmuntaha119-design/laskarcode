@@ -79,9 +79,9 @@ describe.runIf(hasRemoteEnv)('Task 012 — E2E Live Remote Supabase Flow (FULL P
     expect(profileData!.nickname).toBe(testNickname);
     expect(profileData!.avatar_id).toBe(testAvatarId);
 
-    // 2. Generate Kode Petualangan ramah anak (format BOTI-XXXX-XX)
+    // 2. Generate Kode Petualangan ramah anak (format CIPI-XXXX-XX / BOTI-XXXX-XX)
     rawRecoveryCode = generateRecoveryCode();
-    expect(rawRecoveryCode).toMatch(/^BOTI-[2-9A-HJ-NP-Z]{4}-[2-9A-HJ-NP-Z]{2}$/i);
+    expect(rawRecoveryCode).toMatch(/^(CIPI|BOTI)-[2-9A-HJ-NP-Z]{4}-[2-9A-HJ-NP-Z]{2}$/i);
 
     // 3. Hash Kode Petualangan dengan HMAC SHA-256 (jangan simpan kode mentah di DB)
     const recoverySecret = getRecoveryCodeSecret();

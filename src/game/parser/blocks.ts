@@ -14,7 +14,7 @@ export const BLOCK_DEFINITIONS = [
     previousStatement: null,
     nextStatement: null,
     colour: 142, // Vibrant emerald green
-    tooltip: "Boti bergerak maju 1 langkah ke arah depan.",
+    tooltip: "Cipi bergerak maju 1 langkah ke arah depan.",
     helpUrl: "",
   },
   {
@@ -23,7 +23,7 @@ export const BLOCK_DEFINITIONS = [
     previousStatement: null,
     nextStatement: null,
     colour: 200, // Sky blue
-    tooltip: "Boti berputar 90 derajat ke kiri.",
+    tooltip: "Cipi berputar 90 derajat ke kiri.",
     helpUrl: "",
   },
   {
@@ -32,26 +32,29 @@ export const BLOCK_DEFINITIONS = [
     previousStatement: null,
     nextStatement: null,
     colour: 220, // Indigo blue
-    tooltip: "Boti berputar 90 derajat ke kanan.",
+    tooltip: "Cipi berputar 90 derajat ke kanan.",
     helpUrl: "",
   },
 ];
 
 /**
  * Maps block type string to corresponding GameAction.
- * Supports both custom block names ('boti_move') and uppercase names ('MOVE').
+ * Supports both custom block names ('boti_move', 'cipi_move') and uppercase names ('MOVE').
  */
 export function blockTypeToAction(type: string): GameAction | null {
   switch (type) {
     case BLOCK_IDS.MOVE:
+    case "cipi_move":
     case "MOVE":
     case "move":
       return "MOVE";
     case BLOCK_IDS.TURN_LEFT:
+    case "cipi_turn_left":
     case "TURN_LEFT":
     case "turn_left":
       return "TURN_LEFT";
     case BLOCK_IDS.TURN_RIGHT:
+    case "cipi_turn_right":
     case "TURN_RIGHT":
     case "turn_right":
       return "TURN_RIGHT";

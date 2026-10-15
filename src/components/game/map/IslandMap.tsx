@@ -9,7 +9,6 @@ import {
   Compass,
   Lock,
   Play,
-  Sparkles,
   Star,
   Trophy,
 } from "lucide-react";
@@ -68,8 +67,8 @@ export function IslandMap({
 
           <p className="relative z-10 text-sm text-[#64748B] leading-relaxed mb-6 max-w-md mx-auto">
             Jembatan menuju pulau ini masih tertutup kabut tebal. Selesaikan seluruh 6 tantangan di{" "}
-            <strong className="text-[#087F5B]">Pulau 1 — Desa Boti</strong> (Level 1.1 sampai 1.6) untuk
-            membuka jembatan penyeberangan! Boti sudah siap menunggumu.
+            <strong className="text-[#087F5B]">Pulau 1 — Desa Cipi</strong> (Level 1.1 sampai 1.6) untuk
+            membuka jembatan penyeberangan! Cipi sudah siap menunggumu.
           </p>
 
           <div className="relative z-10 flex flex-col sm:flex-row gap-3 justify-center">
@@ -78,7 +77,7 @@ export function IslandMap({
               href="/map/desa-boti"
               className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#12B886] hover:bg-[#0fa678] text-white px-6 py-3.5 text-sm font-bold shadow-[0_4px_0_#087F5B] active:translate-y-1 active:shadow-none transition-all min-h-12 cursor-pointer"
             >
-              <span>Pergi ke Desa Boti</span>
+              <span>Pergi ke Desa Cipi</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
@@ -194,7 +193,7 @@ export function IslandMap({
 
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 border border-white/25 px-3 py-1 text-xs font-bold text-white backdrop-blur-xs">
               <Compass className="h-3.5 w-3.5" />
-              {island.slug === "desa-boti" ? "Pulau 1 • Tahap Pemula" : "Pulau 2 • Logika Pola"}
+              {island.slug === "desa-boti" || island.slug === "desa-cipi" ? "Pulau 1 • Tahap Pemula" : "Pulau 2 • Logika Pola"}
             </span>
           </div>
 
@@ -249,7 +248,7 @@ export function IslandMap({
         {/* Playful terrain backdrop with soft theme gradient */}
         <div
           className={`absolute inset-0 -z-10 ${
-            island.slug === "desa-boti"
+            island.slug === "desa-boti" || island.slug === "desa-cipi"
               ? "bg-linear-to-b from-[#FFFDF7] via-[#EBF7F2]/60 to-[#FFFDF7]"
               : "bg-linear-to-b from-[#FFFDF7] via-[#E7F5FF]/60 to-[#FFFDF7]"
           }`}
@@ -259,17 +258,12 @@ export function IslandMap({
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pb-6 border-b border-[#E8EDF5] mb-8">
           <div>
             <h2 className="text-lg sm:text-xl font-black text-[#26334D]">
-              Jalur Petualangan {island.slug === "desa-boti" ? "Desa Boti" : "Hutan Pola"}
+              Jalur Petualangan {island.slug === "desa-boti" || island.slug === "desa-cipi" ? "Desa Cipi" : "Hutan Pola"}
             </h2>
             <p className="text-xs sm:text-sm text-[#64748B] mt-0.5">
               Ikuti jalan setapak berkelok dari Level {island.levelCodes[0]} hingga Level{" "}
               {island.levelCodes[island.levelCodes.length - 1]}.
             </p>
-          </div>
-
-          <div className="inline-flex items-center gap-2 text-xs font-bold text-[#087F5B] bg-[#12B886]/10 px-4 py-2 rounded-full border border-[#12B886]/20 shadow-xs">
-            <Sparkles className="w-3.5 h-3.5 text-[#12B886]" />
-            <span>Pilih titik level yang terbuka untuk bermain</span>
           </div>
         </div>
 
@@ -285,15 +279,14 @@ export function IslandMap({
             const isCompleted = summary.isCompleted;
             const isLocked = summary.isLocked;
             const isCurrentActive = code === activeLevelCode && !isCompleted;
-            const isBossLevel = index === island.levelCodes.length - 1;
 
             const align = nodeAlignments[index % nodeAlignments.length];
 
             const conceptLabel = level.concepts
               .map((c) =>
-                c === "MOVE" || c === "boti_move"
+                c === "MOVE" || c === "boti_move" || c === "cipi_move"
                   ? "Langkah Maju"
-                  : c === "TURN" || c === "boti_turn"
+                  : c === "TURN" || c === "boti_turn" || c === "cipi_turn"
                   ? "Arah Belok"
                   : c === "SEQUENCE"
                   ? "Urutan Langkah"
@@ -314,11 +307,10 @@ export function IslandMap({
                   >
                     {/* The Interactive Node Token */}
                     <div className="relative flex items-center justify-center shrink-0">
-                      {/* Boti Mascot Companion (Floating right above the active node!) */}
+                      {/* Cipi Mascot Companion (Floating right above the active node!) */}
                       {isCurrentActive && (
                         <div className="absolute -top-16 sm:-top-18 flex flex-col items-center animate-bounce z-20 pointer-events-none">
                           <div className="bg-white text-[#087F5B] text-[10px] font-black px-3.5 py-1 rounded-full shadow-lg border-2 border-[#12B886] whitespace-nowrap flex items-center gap-1.5">
-                            <span className="w-2 h-2 rounded-full bg-[#12B886] animate-pulse" />
                             <span>{profile.nickname} di sini!</span>
                           </div>
                           <div className="relative -mt-1 p-1 bg-white rounded-full shadow-lg border-2 border-[#12B886]">
@@ -410,13 +402,6 @@ export function IslandMap({
                         >
                           Level {code}
                         </span>
-
-                        {isBossLevel && (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-black px-2 py-0.5 rounded-full bg-[#FFD43B]/20 text-[#B45309] border border-[#FFD43B]/40">
-                            <Trophy className="w-3 h-3 text-[#F59F00]" />
-                            Tantangan Puncak
-                          </span>
-                        )}
 
                         <span className="text-[10px] font-bold text-[#64748B]">
                           {conceptLabel}

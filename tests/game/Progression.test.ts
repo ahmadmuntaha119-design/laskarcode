@@ -73,7 +73,7 @@ describe("Progression & Active Level Execution", () => {
     it("starts with active level 1.1", () => {
       const store = useProgressionStore.getState();
       expect(store.activeLevelCode).toBe("1.1");
-      expect(store.getActiveLevel().title).toBe("Boti Mau Maju");
+      expect(store.getActiveLevel().title).toBe("Cipi Mau Maju");
     });
 
     it("prevents switching to locked levels", () => {

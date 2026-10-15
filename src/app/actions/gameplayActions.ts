@@ -84,15 +84,22 @@ export async function submitGameplayAttemptAction(
   const { levelCode, actions, durationMs, startedAt } = parsed.data;
 
   try {
-    // 3. Ambil konfigurasi level resmi
+    // 3. Ambil konfigurasi level resmi (dengan fallback aman ke LevelCatalog jika DB belum di-seed)
     const levelService = new LevelService();
     const progressService = new ProgressService();
 
-    const level = await levelService.getLevelByCode(levelCode);
-    let levelId = level?.id;
-    let levelConfig = level?.configuration;
+    let levelId: string | undefined = undefined;
+    let levelConfig: unknown = null;
 
-    // Fallback ke catalog jika level query tidak mengembalikan data
+    try {
+      const level = await levelService.getLevelByCode(levelCode);
+      levelId = level?.id;
+      levelConfig = level?.configuration;
+    } catch {
+      // Database belum di-seed atau offline, gunakan fallback catalog
+    }
+
+    // Fallback ke catalog jika level query tidak mengembalikan data atau database belum siap
     if (!levelConfig) {
       const catalogLevel = getCatalogLevelByCode(levelCode);
       if (!catalogLevel) {
@@ -105,21 +112,18 @@ export async function submitGameplayAttemptAction(
     }
 
     if (!levelId) {
-      // Ambil levelId dari DB jika belum tersedia
-      const allDbLevels = await levelService.getActiveLevels();
-      const match = allDbLevels.find((l) => l.code === levelCode);
-      levelId = match?.id;
-    }
-
-    if (!levelId) {
-      return {
-        success: false,
-        error: `Identitas database untuk level '${levelCode}' tidak ditemukan.`,
-      };
+      try {
+        const allDbLevels = await levelService.getActiveLevels();
+        const match = allDbLevels.find((l) => l.code === levelCode);
+        levelId = match?.id;
+      } catch {
+        // Abaikan jika database belum siap
+      }
     }
 
     // 4. Validasi ketersediaan blok untuk level ini
-    const availableBlocks = new Set(levelConfig.availableBlocks);
+    const typedConfig = levelConfig as { availableBlocks: string[]; maxActions: number };
+    const availableBlocks = new Set(typedConfig.availableBlocks);
     for (const action of actions) {
       if (!availableBlocks.has(action)) {
         return {
@@ -129,10 +133,10 @@ export async function submitGameplayAttemptAction(
       }
     }
 
-    if (actions.length > levelConfig.maxActions) {
+    if (actions.length > typedConfig.maxActions) {
       return {
         success: false,
-        error: `Jumlah aksi (${actions.length}) melebihi batas maksimal level (${levelConfig.maxActions}).`,
+        error: `Jumlah aksi (${actions.length}) melebihi batas maksimal level (${typedConfig.maxActions}).`,
       };
     }
 
@@ -161,85 +165,135 @@ export async function submitGameplayAttemptAction(
       successful,
       actionsUsed,
       collisions,
-      levelConfig.maxActions
+      typedConfig.maxActions
     );
 
-    // 7. Hitung nomor attempt ke berapa untuk level ini
-    const priorAttemptCount = await progressService.getAttemptCount(auth, profileId, levelId);
-    const attemptNumber = priorAttemptCount + 1;
+    let recordedAttemptId: string | undefined = undefined;
+    let updatedProgress = undefined;
+    let saveNotice: string | undefined = undefined;
 
-    // 8. Simpan catatan attempt ke `level_attempts`
-    const recordedAttempt = await progressService.recordAttempt(auth, {
-      profileId,
-      levelId,
-      attemptNumber,
-      successful,
-      actionsUsed,
-      collisions,
-      timeToCompleteMs: durationMs ?? null,
-      errorTypes,
-      programData: actions,
-      startedAt: startedAt ?? new Date().toISOString(),
-      completedAt: new Date().toISOString(),
-    });
+    // 7. Simpan catatan attempt dan update level_progress jika tabel DB tersedia
+    if (levelId) {
+      try {
+        const priorAttemptCount = await progressService.getAttemptCount(auth, profileId, levelId);
+        const attemptNumber = priorAttemptCount + 1;
 
-    // 9. Ambil progress sebelumnya untuk mencegah regresi data
-    const existingProgress = await progressService.getSingleLevelProgress(auth, profileId, levelId);
+        const recordedAttempt = await progressService.recordAttempt(auth, {
+          profileId,
+          levelId,
+          attemptNumber,
+          successful,
+          actionsUsed,
+          collisions,
+          timeToCompleteMs: durationMs ?? null,
+          errorTypes,
+          programData: actions,
+          startedAt: startedAt ?? new Date().toISOString(),
+          completedAt: new Date().toISOString(),
+        });
+        recordedAttemptId = recordedAttempt.attemptId;
 
-    // Tentukan status dan rekaman terbaik
-    let status: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED' = 'IN_PROGRESS';
-    let stars = 0;
-    let bestAttempts = attemptNumber;
-    let bestTimeMs = durationMs ?? null;
-    let completedAt: string | null = null;
+        // Ambil progress sebelumnya untuk mencegah regresi data
+        const existingProgress = await progressService.getSingleLevelProgress(auth, profileId, levelId);
 
-    if (successful) {
-      status = 'COMPLETED';
-      stars = Math.max(existingProgress?.stars ?? 0, computedStars);
-      bestAttempts = existingProgress?.status === 'COMPLETED' ? existingProgress.bestAttempts : attemptNumber;
-      if (existingProgress?.bestTimeMs && durationMs) {
-        bestTimeMs = Math.min(existingProgress.bestTimeMs, durationMs);
-      } else {
-        bestTimeMs = durationMs ?? existingProgress?.bestTimeMs ?? null;
+        let status: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED' = 'IN_PROGRESS';
+        let stars = 0;
+        let bestAttempts = attemptNumber;
+        let bestTimeMs = durationMs ?? null;
+        let completedAt: string | null = null;
+
+        if (successful) {
+          status = 'COMPLETED';
+          stars = Math.max(existingProgress?.stars ?? 0, computedStars);
+          bestAttempts = existingProgress?.status === 'COMPLETED' ? existingProgress.bestAttempts : attemptNumber;
+          if (existingProgress?.bestTimeMs && durationMs) {
+            bestTimeMs = Math.min(existingProgress.bestTimeMs, durationMs);
+          } else {
+            bestTimeMs = durationMs ?? existingProgress?.bestTimeMs ?? null;
+          }
+          completedAt = existingProgress?.completedAt ?? new Date().toISOString();
+        } else {
+          if (existingProgress?.status === 'COMPLETED') {
+            status = 'COMPLETED';
+            stars = existingProgress.stars;
+            bestAttempts = existingProgress.bestAttempts;
+            bestTimeMs = existingProgress.bestTimeMs;
+            completedAt = existingProgress.completedAt;
+          } else {
+            status = 'IN_PROGRESS';
+            stars = 0;
+            bestAttempts = 0;
+          }
+        }
+
+        updatedProgress = await progressService.updateLevelProgress(auth, {
+          profileId,
+          levelId,
+          status,
+          stars,
+          bestAttempts,
+          bestTimeMs,
+          completedAt,
+        });
+      } catch (dbErr) {
+        if (dbErr instanceof DatabaseOperationError) {
+          return {
+            success: false,
+            error: `Kendala penyimpanan database: ${dbErr.message}`,
+          };
+        }
+        console.warn('Database save warning (offline/unseeded):', dbErr);
+        saveNotice = 'Progres bermain disimpan lokal (database Supabase belum aktif).';
       }
-      completedAt = existingProgress?.completedAt ?? new Date().toISOString();
     } else {
-      // Jika attempt gagal, JANGAN menurunkan status jika sudah pernah COMPLETED
-      if (existingProgress?.status === 'COMPLETED') {
-        status = 'COMPLETED';
-        stars = existingProgress.stars;
-        bestAttempts = existingProgress.bestAttempts;
-        bestTimeMs = existingProgress.bestTimeMs;
-        completedAt = existingProgress.completedAt;
-      } else {
-        status = 'IN_PROGRESS';
-        stars = 0;
-        bestAttempts = 0;
-      }
+      saveNotice = 'Progres bermain lokal (tabel database Supabase belum terisi).';
     }
 
-    // 10. Perbarui progres ke `level_progress`
-    const updatedProgress = await progressService.updateLevelProgress(auth, {
-      profileId,
-      levelId,
-      status,
-      stars,
-      bestAttempts,
-      bestTimeMs,
-      completedAt,
-    });
+    // Simpan progres ke cookie fallback agar sesi pemain offline tetap berlanjut antar level
+    if (successful) {
+      try {
+        const { cookies } = await import('next/headers');
+        const cookieStore = await cookies();
+        const existingCookie = cookieStore.get('laskarcode_guest_progress')?.value;
+        let progressCookieData: Record<string, { status: string; stars: number }> = {};
+        if (existingCookie) {
+          try {
+            progressCookieData = JSON.parse(existingCookie);
+          } catch {
+            // Abaikan jika cookie lama tidak valid JSON
+          }
+        }
+        progressCookieData[levelCode] = {
+          status: 'COMPLETED',
+          stars: Math.max(progressCookieData[levelCode]?.stars ?? 0, computedStars),
+        };
+        cookieStore.set({
+          name: 'laskarcode_guest_progress',
+          value: JSON.stringify(progressCookieData),
+          path: '/',
+          httpOnly: false,
+          sameSite: 'lax',
+          maxAge: 60 * 60 * 24 * 30, // 30 hari
+        });
+      } catch (cookieErr) {
+        if (process.env.NODE_ENV !== 'test') {
+          console.warn('Gagal menyimpan fallback progress cookie:', cookieErr);
+        }
+      }
+    }
 
     return {
       success: true,
       verifiedResult: {
         successful,
-        stars,
+        stars: computedStars,
         actionsUsed,
         collisions,
         status: verifiedResult.status,
       },
       progress: updatedProgress,
-      attemptId: recordedAttempt.attemptId,
+      attemptId: recordedAttemptId,
+      error: saveNotice,
     };
   } catch (err: unknown) {
     if (err instanceof DatabaseOperationError) {

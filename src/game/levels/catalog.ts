@@ -4,8 +4,8 @@ export const ISLANDS: readonly IslandDefinition[] = [
   {
     id: "desa-boti",
     slug: "desa-boti",
-    name: "Pulau 1 — Desa Boti",
-    description: "Petualangan perdana Boti mempelajari instruksi dasar, urutan langkah (sequence), dan arah belok.",
+    name: "Pulau 1 — Desa Cipi",
+    description: "Petualangan perdana Cipi mempelajari instruksi dasar, urutan langkah (sequence), dan arah belok.",
     orderIndex: 1,
     levelCodes: ["1.1", "1.2", "1.3", "1.4", "1.5", "1.6"],
   },
@@ -21,13 +21,13 @@ export const ISLANDS: readonly IslandDefinition[] = [
 
 export const LEVEL_CATALOG: readonly LevelDefinition[] = [
   // ==========================================
-  // PULAU 1 — DESA BOTI
+  // PULAU 1 — DESA CIPI
   // ==========================================
   {
     code: "1.1",
     islandSlug: "desa-boti",
-    title: "Boti Mau Maju",
-    description: "Bantu Boti melangkah maju 4 kali untuk mencapai bintang target pertamanya.",
+    title: "Cipi Mau Maju",
+    description: "Bantu Cipi melangkah maju 4 kali untuk mencapai bintang target pertamanya.",
     levelType: "Learn",
     orderIndex: 1,
     difficulty: 1,
@@ -43,7 +43,7 @@ export const LEVEL_CATALOG: readonly LevelDefinition[] = [
     code: "1.2",
     islandSlug: "desa-boti",
     title: "Jalan Menuju Apel",
-    description: "Pahami konsep urutan (Sequence) dengan menyusun langkah maju Boti menuju apel emas.",
+    description: "Pahami konsep urutan (Sequence) dengan menyusun langkah maju Cipi menuju apel emas.",
     levelType: "Learn",
     orderIndex: 2,
     difficulty: 1,
@@ -58,7 +58,7 @@ export const LEVEL_CATALOG: readonly LevelDefinition[] = [
   {
     code: "1.3",
     islandSlug: "desa-boti",
-    title: "Belok, Boti!",
+    title: "Belok, Cipi!",
     description: "Pelajari cara berbelok menggunakan blok Belok Kanan dan Belok Kiri untuk menghindari pembatas.",
     levelType: "Learn",
     orderIndex: 3,
@@ -78,7 +78,7 @@ export const LEVEL_CATALOG: readonly LevelDefinition[] = [
     code: "1.4",
     islandSlug: "desa-boti",
     title: "Jalan Desa",
-    description: "Rencanakan rute berliku di jalan desa agar Boti sampai ke tujuan tanpa menabrak rintangan.",
+    description: "Rencanakan rute berliku di jalan desa agar Cipi sampai ke tujuan tanpa menabrak rintangan.",
     levelType: "Practice",
     orderIndex: 4,
     difficulty: 2,
@@ -98,8 +98,8 @@ export const LEVEL_CATALOG: readonly LevelDefinition[] = [
   {
     code: "1.5",
     islandSlug: "desa-boti",
-    title: "Perbaiki Jalan Boti",
-    description: "Temukan dan perbaiki kesalahan (bug) pada urutan langkah Boti agar tidak menabrak rintangan.",
+    title: "Perbaiki Jalan Cipi",
+    description: "Temukan dan perbaiki kesalahan (bug) pada urutan langkah Cipi agar tidak menabrak rintangan.",
     levelType: "Debugging",
     orderIndex: 5,
     difficulty: 2,
@@ -118,8 +118,8 @@ export const LEVEL_CATALOG: readonly LevelDefinition[] = [
   {
     code: "1.6",
     islandSlug: "desa-boti",
-    title: "Tantangan Kepala Boti",
-    description: "Uji keahlianmu menyelesaikan rute petualangan mandiri untuk membuktikan kelulusan dari Desa Boti!",
+    title: "Tantangan Kelulusan Cipi",
+    description: "Uji keahlianmu menyelesaikan rute petualangan mandiri untuk membuktikan kelulusan dari Desa Cipi!",
     levelType: "Mastery Check",
     orderIndex: 6,
     difficulty: 3,
@@ -183,7 +183,7 @@ export const LEVEL_CATALOG: readonly LevelDefinition[] = [
     code: "2.3",
     islandSlug: "hutan-pola",
     title: "Urutkan Instruksi",
-    description: "Susun kembali algoritma langkah Boti yang berantakan agar berurutan dengan benar menuju target.",
+    description: "Susun kembali algoritma langkah Cipi yang berantakan agar berurutan dengan benar menuju target.",
     levelType: "Practice",
     orderIndex: 9,
     difficulty: 2,
@@ -286,9 +286,12 @@ export function getIslands(): readonly IslandDefinition[] {
 }
 
 /**
- * Gets an island definition by slug or id (e.g. "desa-boti", "hutan-pola").
+ * Gets an island definition by slug or id (e.g. "desa-boti", "desa-cipi", "hutan-pola").
  */
 export function getIslandBySlug(slug: string): IslandDefinition | undefined {
+  if (slug === "desa-cipi") {
+    return ISLANDS.find((island) => island.slug === "desa-boti");
+  }
   return ISLANDS.find((island) => island.slug === slug || island.id === slug);
 }
 

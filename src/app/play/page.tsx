@@ -22,12 +22,13 @@ import Link from "next/link";
 type PlayPageProps = {
   searchParams: Promise<{
     level?: string;
+    dev?: string;
   }>;
 };
 
 export const metadata: Metadata = {
   title: "Petualangan Level — LaskarCode",
-  description: "Belajar coding dengan visual programming Blockly dan bantu Boti menuntaskan misi di Pulau Desa Boti dan Hutan Pola",
+  description: "Belajar coding dengan visual programming Blockly dan bantu Cipi menuntaskan misi di Pulau Desa Cipi dan Hutan Pola",
 };
 
 function PlayPageSkeleton() {
@@ -42,10 +43,10 @@ function PlayPageSkeleton() {
 async function PlayPageContent({
   searchParamsPromise,
 }: {
-  searchParamsPromise: Promise<{ level?: string }>;
+  searchParamsPromise: Promise<{ level?: string; dev?: string }>;
 }) {
   await connection();
-  const { level: requestedLevelCode } = await searchParamsPromise;
+  const { level: requestedLevelCode, dev: devQuery } = await searchParamsPromise;
 
   // 1. Verifikasi sesi guest di server (Protected Route)
   const session = await resolveGuestSession();
@@ -116,8 +117,27 @@ async function PlayPageContent({
     console.warn("Gagal memuat player progress dari database:", err);
   }
 
-  // Build progressMap
+  // Build progressMap: merge local cookie fallback (offline resilience) with Supabase database progress
   const progressMap: Record<string, LevelProgress> = {};
+
+  try {
+    const { cookies } = await import("next/headers");
+    const cookieStore = await cookies();
+    const fallbackCookie = cookieStore.get("laskarcode_guest_progress")?.value;
+    if (fallbackCookie) {
+      const parsed = JSON.parse(fallbackCookie);
+      for (const [code, val] of Object.entries(parsed)) {
+        const v = val as { status?: "COMPLETED" | "IN_PROGRESS" | "NOT_STARTED"; stars?: number };
+        progressMap[code] = {
+          status: v.status ?? "COMPLETED",
+          stars: v.stars ?? 1,
+        };
+      }
+    }
+  } catch {
+    // Abaikan jika cookie parsing gagal
+  }
+
   for (const p of playerProgress) {
     if (p.levelCode) {
       progressMap[p.levelCode] = {
@@ -138,7 +158,8 @@ async function PlayPageContent({
     if (!requestedLevel) {
       activeCode = getLatestPlayableLevel(progressMap).code;
     } else {
-      const unlocked = isLevelUnlocked(activeCode, completedCodes);
+      const isDevBypass = process.env.NODE_ENV === "development" && (devQuery === "true" || process.env.STRICT_PROGRESSION === "false");
+      const unlocked = isDevBypass || isLevelUnlocked(activeCode, completedCodes);
       if (!unlocked) {
         // Show friendly locked level feedback
         return (
@@ -177,6 +198,17 @@ async function PlayPageContent({
                 Main Level Terbuka
               </Link>
             </div>
+
+            {process.env.NODE_ENV === "development" && (
+              <div className="relative z-10 mt-5 pt-4 border-t border-slate-100 flex justify-center">
+                <Link
+                  href={`/play?level=${activeCode}&dev=true`}
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-700 hover:text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200/80 px-3.5 py-2 rounded-xl transition-all"
+                >
+                  <span>Buka di Mode Pengembang (Pratinjau Level {activeCode})</span>
+                </Link>
+              </div>
+            )}
           </div>
         );
       }

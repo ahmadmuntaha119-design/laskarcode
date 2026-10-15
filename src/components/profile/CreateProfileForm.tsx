@@ -64,7 +64,7 @@ export function CreateProfileForm() {
           Buat Profil Petualanganmu!
         </h1>
         <p className="mt-2 text-sm text-[#64748B]">
-          Cukup pilih nama panggilan dan karakter Boti favoritmu. Tanpa email, tanpa kata sandi!
+          Cukup pilih nama panggilan dan karakter Cipi favoritmu. Tanpa email, tanpa kata sandi!
         </p>
       </div>
 

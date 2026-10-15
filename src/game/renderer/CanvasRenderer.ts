@@ -98,7 +98,7 @@ export class CanvasRenderer implements IRenderer {
   }
 
   /**
-   * Renders the game board, grid, obstacles, goal, and Boti state.
+   * Renders the game board, grid, obstacles, goal, and Cipi state.
    */
   public render(state: BotiState, options: RenderOptions = {}): void {
     this.lastState = {
@@ -119,7 +119,7 @@ export class CanvasRenderer implements IRenderer {
     // 2. Draw Grid Tiles
     this.drawTiles(dims);
 
-    // 3. Draw Start Indicator
+    // 3. Draw Start Marker
     this.drawStartMarker(this.config.start, dims);
 
     // 4. Draw Goal
@@ -130,8 +130,8 @@ export class CanvasRenderer implements IRenderer {
       this.drawObstacle(obstacle, dims);
     }
 
-    // 6. Draw Boti
-    this.drawBoti(state.position, state.direction, dims, options);
+    // 6. Draw Cipi
+    this.drawCipi(state.position, state.direction, dims, options);
   }
 
   private drawBoardBackground(dims: RendererDimensions): void {
@@ -261,7 +261,7 @@ export class CanvasRenderer implements IRenderer {
     ctx.restore();
   }
 
-  private drawBoti(
+  private drawCipi(
     pos: Position,
     direction: Direction,
     dims: RendererDimensions,
@@ -276,7 +276,7 @@ export class CanvasRenderer implements IRenderer {
     ctx.save();
     ctx.translate(cx, cy);
 
-    // Rotate according to Boti's direction:
+    // Rotate according to Cipi's direction:
     // "EAST" is 0 rad (right), "SOUTH" is PI/2 (down), "WEST" is PI (left), "NORTH" is -PI/2 (up)
     const angleMap: Record<Direction, number> = {
       EAST: 0,

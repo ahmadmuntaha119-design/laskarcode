@@ -2,8 +2,9 @@
 
 import React, { useCallback, useMemo, useRef, useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type * as Blockly from "blockly";
-import { ArrowLeft, ArrowRight, Compass, Sparkles, Star, Target, Trophy } from "lucide-react";
+import { ArrowLeft, ArrowRight, Compass, Sparkles, Star, Trophy } from "lucide-react";
 import type { BotiState, LevelConfig } from "@/game/types";
 import { BlocklyParser } from "@/game/parser";
 import { type ControllerStatus, GameController } from "@/game/execution";
@@ -20,6 +21,8 @@ import { GameBoard } from "./GameBoard";
 import { BlocklyWorkspace } from "./BlocklyWorkspace";
 import { GameControls } from "./GameControls";
 import { FeedbackBanner } from "./FeedbackBanner";
+import { KawanKodHint } from "./KawanKodHint";
+import { BotiStoryCard } from "./BotiStoryCard";
 import type { PlayerProgressDTO } from "@/services/types";
 
 export type LevelPlayerProps = {
@@ -59,6 +62,8 @@ function LevelPlaySession({
   const [collisions, setCollisions] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isSubmittingRef = useRef(false);
+  const [lastErrorType, setLastErrorType] = useState<string | null>(null);
+  const [attemptId, setAttemptId] = useState<string | null>(null);
 
   // Setup controller callbacks
   useEffect(() => {
@@ -72,6 +77,10 @@ function LevelPlaySession({
           stepResult.event.type === "BOUNDARY_COLLISION" ||
           stepResult.event.type === "OBSTACLE_COLLISION";
         const isGoal = stepResult.event.type === "GOAL_REACHED";
+
+        if (isCollision) {
+          setLastErrorType(stepResult.event.type);
+        }
 
         setRenderOptions({
           isColliding: isCollision,
@@ -87,6 +96,19 @@ function LevelPlaySession({
         setStatus(gameResult.status);
         setActionsExecuted(gameResult.actionsExecuted);
         setCollisions(gameResult.collisions);
+
+        if (gameResult.status === "FAILED") {
+          setLastErrorType((prev) => {
+            if (prev) return prev;
+            if (gameResult.actionsExecuted >= activeLevel.maxActions) {
+              return "MAX_ACTIONS_REACHED";
+            }
+            return "GOAL_NOT_REACHED";
+          });
+        } else if (gameResult.status === "SUCCESS") {
+          setLastErrorType(null);
+        }
+
         setRenderOptions((prev) => ({
           ...prev,
           isGoal: gameResult.status === "SUCCESS",
@@ -102,6 +124,8 @@ function LevelPlaySession({
         setVerifiedStars(null);
         setActionsExecuted(0);
         setCollisions(0);
+        setLastErrorType(null);
+        setAttemptId(null);
         isSubmittingRef.current = false;
       },
     });
@@ -109,7 +133,7 @@ function LevelPlaySession({
     return () => {
       controller.cancelExecution();
     };
-  }, [controller, avatarId]);
+  }, [controller, avatarId, activeLevel.maxActions]);
 
   const handleWorkspaceReady = useCallback((workspace: Blockly.WorkspaceSvg) => {
     workspaceRef.current = workspace;
@@ -172,6 +196,9 @@ function LevelPlaySession({
           });
 
           if (res.success && res.verifiedResult) {
+            if (res.attemptId) {
+              setAttemptId(res.attemptId);
+            }
             if (res.verifiedResult.successful) {
               setVerifiedStars(res.verifiedResult.stars);
               completeLevel(levelDef.code, res.verifiedResult.stars);
@@ -200,35 +227,13 @@ function LevelPlaySession({
     setSaveNotice(null);
   }, [controller]);
 
-  const blockNames = activeLevel.availableBlocks
-    .map((b) => {
-      const bStr = String(b);
-      return bStr === "MOVE" || bStr === "boti_move"
-        ? "Maju"
-        : bStr === "TURN_LEFT" || bStr === "boti_turn_left"
-        ? "Belok Kiri"
-        : bStr === "TURN_RIGHT" || bStr === "boti_turn_right"
-        ? "Belok Kanan"
-        : bStr;
-    })
-    .join(" • ");
-
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
       {/* Left Column: Board & Status (Desktop ~42%) */}
       <section className="lg:col-span-5 flex flex-col gap-3.5">
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider text-[#087F5B]">
-              <Compass className="w-3.5 h-3.5 text-[#12B886]" />
-              <span>Arena Petualangan ({activeLevel.grid.width}×{activeLevel.grid.height})</span>
-            </div>
-            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#64748B] bg-slate-100 border border-slate-200 px-2.5 py-0.5 rounded-full">
-              <span>Titik Mulai:</span>
-              <span className="font-extrabold text-[#26334D]">
-                ({activeLevel.start.x}, {activeLevel.start.y})
-              </span>
-            </span>
+           
           </div>
           <GameBoard
             levelConfig={activeLevel}
@@ -245,6 +250,17 @@ function LevelPlaySession({
           verifiedStars={verifiedStars}
           saveNotice={saveNotice}
         />
+
+        {/* Kawan Kod AI Hint Mentor — Hanya ditampilkan saat pemain sedang berjuang atau gagal */}
+        {status !== "SUCCESS" && (
+          <KawanKodHint
+            key={levelDef?.code ?? "custom"}
+            levelCode={levelDef?.code ?? ("code" in activeLevel ? (activeLevel as { code: string }).code : "1.1")}
+            currentErrorType={lastErrorType}
+            disabled={status === "RUNNING"}
+            attemptId={attemptId}
+          />
+        )}
 
         {/* Next Level Progression Banner (Celebration Card) */}
         {status === "SUCCESS" && (
@@ -282,23 +298,30 @@ function LevelPlaySession({
               </svg>
             </div>
 
-            {/* Top row: Trophy, Title, Subtitle */}
+            {/* Top row: Trophy Icon + Title + Subtitle */}
             <div className="relative z-10 flex items-start gap-3.5">
-              <div className="flex h-13 w-13 shrink-0 items-center justify-center rounded-2xl bg-white/20 border-2 border-white/35 shadow-inner text-[#FFE66D] backdrop-blur-xs">
-                <Trophy className="h-7 w-7 drop-shadow-xs" />
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/25 border-2 border-white/40 shadow-inner text-[#FFE66D] backdrop-blur-xs">
+                <Trophy className="h-6 w-6 fill-[#FFE66D]" />
               </div>
 
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-0.5">
-                  <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider bg-white/20 px-2.5 py-0.5 rounded-full text-emerald-100 backdrop-blur-xs border border-white/20">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider bg-white/20 px-2.5 py-0.5 rounded-full text-emerald-100 backdrop-blur-xs border border-white/25">
                     <Sparkles className="w-3 h-3 text-[#FFE66D]" />
                     Misi Berhasil
                   </span>
+                  {verifiedStars !== null && verifiedStars > 0 && (
+                    <div className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-black/15 border border-white/15">
+                      {Array.from({ length: verifiedStars }).map((_, i) => (
+                        <Star key={i} className="h-3 w-3 fill-[#FFE66D] text-[#FFE66D]" />
+                      ))}
+                    </div>
+                  )}
                 </div>
-                <h4 className="font-black text-lg sm:text-xl text-white tracking-tight">
+                <h4 className="font-black text-xl sm:text-2xl text-white tracking-tight leading-tight">
                   Level {levelDef?.code} Selesai!
                 </h4>
-                <p className="text-xs sm:text-sm text-emerald-50 font-medium leading-relaxed mt-0.5">
+                <p className="text-xs sm:text-sm text-emerald-100 font-medium leading-relaxed mt-0.5">
                   {nextLevel
                     ? `Tantangan berikutnya: Level ${nextLevel.code} — ${nextLevel.title}`
                     : "Luar biasa! Kamu telah menuntaskan seluruh tantangan di pulau ini!"}
@@ -306,27 +329,36 @@ function LevelPlaySession({
               </div>
             </div>
 
-            {/* Bottom row: Action Buttons (Dedicated row, guaranteed NO overflow!) */}
-            <div className="relative z-10 pt-3 border-t border-white/20 grid grid-cols-1 sm:grid-cols-2 gap-2.5 w-full">
+            {/* Boti Story: AI Interactive Storytelling & Voice Narration */}
+            <BotiStoryCard
+              levelCode={levelDef?.code ?? ("code" in activeLevel ? (activeLevel as { code: string }).code : "1.1")}
+              attemptId={attemptId}
+              actionsUsed={actionsExecuted}
+              stars={verifiedStars ?? 1}
+              collisions={collisions}
+            />
+
+            {/* Bottom row: Action Buttons (Dedicated row, guaranteed high visibility) */}
+            <div className="relative z-10 pt-2 grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
               {nextLevel && (
-                <button
+                <Link
                   id="btn-next-level"
-                  type="button"
+                  href={`/play?level=${nextLevel.code}`}
                   onClick={onNextLevel}
-                  className="w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-white hover:bg-slate-50 px-5 py-3.5 text-xs sm:text-sm font-black text-[#087F5B] shadow-[0_4px_0_#065f46]/25 transition-all active:translate-y-1 active:shadow-none cursor-pointer min-h-12"
+                  className="w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-white hover:bg-slate-50 px-5 py-3.5 text-sm sm:text-base font-black text-[#087F5B] shadow-[0_4px_0_#065f46]/30 transition-all active:translate-y-1 active:shadow-none cursor-pointer min-h-12"
                 >
                   <span>Lanjut Misi</span>
-                  <ArrowRight className="h-4 w-4 stroke-[3]" />
-                </button>
+                  <ArrowRight className="h-4.5 w-4.5 stroke-[3]" />
+                </Link>
               )}
               <Link
                 id="btn-back-island-success"
                 href={`/map/${levelDef?.islandSlug ?? "desa-boti"}`}
-                className={`w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-white/20 hover:bg-white/30 border border-white/35 px-4 py-3.5 text-xs sm:text-sm font-bold text-white transition-all active:translate-y-0.5 cursor-pointer min-h-12 backdrop-blur-xs ${
+                className={`w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-white/20 hover:bg-white/30 border-2 border-white/35 px-4 py-3.5 text-sm sm:text-base font-bold text-white transition-all active:translate-y-0.5 cursor-pointer min-h-12 backdrop-blur-xs ${
                   !nextLevel ? "sm:col-span-2" : ""
                 }`}
               >
-                <Compass className="h-4 w-4" />
+                <Compass className="h-4.5 w-4.5" />
                 <span>Peta Pulau</span>
               </Link>
             </div>
@@ -338,14 +370,7 @@ function LevelPlaySession({
       <section className="lg:col-span-7 flex flex-col gap-3.5">
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider text-[#087F5B]">
-              <Sparkles className="w-3.5 h-3.5 text-[#12B886]" />
-              <span>Area Susun Balok Kode</span>
-            </div>
-            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#1971C2] bg-[#4DABF7]/10 border border-[#4DABF7]/25 px-2.5 py-0.5 rounded-full">
-              <span>Balok:</span>
-              <span className="font-extrabold">{blockNames}</span>
-            </span>
+          
           </div>
 
           <div className="h-107.5 w-full rounded-3xl overflow-hidden border-2 border-[#E8EDF5] bg-white shadow-xs">
@@ -378,6 +403,7 @@ export function LevelPlayer({
   initialProgress,
   avatarId = "boti_explorer",
 }: LevelPlayerProps) {
+  const router = useRouter();
   const { activeLevelCode, setActiveLevelCode, syncProgressFromDatabase } = useProgressionStore();
 
   useEffect(() => {
@@ -386,37 +412,49 @@ export function LevelPlayer({
     }
   }, [initialProgress, syncProgressFromDatabase]);
 
-  // Active level determination: priority customConfig -> activeLevelCode -> fallback 1.1
+  // Sync initialLevelCode to ProgressionStore so store and URL stay in lockstep
+  useEffect(() => {
+    if (initialLevelCode && getLevelByCode(initialLevelCode)) {
+      setActiveLevelCode(initialLevelCode, true);
+    }
+  }, [initialLevelCode, setActiveLevelCode]);
+
+  // Active level determination:
+  // 1. customConfig (if passed directly e.g. for testing)
+  // 2. initialLevelCode (explicit prop from URL searchParams /play?level=X)
+  // 3. activeLevelCode (from store)
+  // 4. Fallback to first level (1.1)
   const activeLevel: LevelDefinition | LevelConfig = useMemo(() => {
     if (customConfig) return customConfig;
-    const fromStore = getLevelByCode(activeLevelCode);
-    if (fromStore) return fromStore;
     const fromProp = getLevelByCode(initialLevelCode);
     if (fromProp) return fromProp;
+    const fromStore = getLevelByCode(activeLevelCode);
+    if (fromStore) return fromStore;
     return getAllLevels()[0];
-  }, [customConfig, activeLevelCode, initialLevelCode]);
+  }, [customConfig, initialLevelCode, activeLevelCode]);
 
   const levelDef = "code" in activeLevel ? (activeLevel as LevelDefinition) : null;
   const nextLevel = levelDef ? getNextLevel(levelDef.code) : null;
   const levelKey = levelDef ? levelDef.code : "custom";
 
   const island = levelDef ? getIslandBySlug(levelDef.islandSlug) : null;
-  const islandName = island ? island.name : "Pulau 1 — Desa Boti";
+  const islandName = island ? island.name : "Pulau 1 — Desa Cipi";
 
   const handleNextLevel = useCallback(() => {
     if (nextLevel) {
-      setActiveLevelCode(nextLevel.code);
+      setActiveLevelCode(nextLevel.code, true);
+      router.push(`/play?level=${nextLevel.code}`);
     }
-  }, [nextLevel, setActiveLevelCode]);
+  }, [nextLevel, setActiveLevelCode, router]);
 
   const title = levelDef ? `${levelDef.code} — ${levelDef.title}` : "Level Permainan";
-  const subtitle = levelDef ? levelDef.description : "Bantu Boti mencapai bintang!";
+  const subtitle = levelDef ? levelDef.description : "Bantu Cipi mencapai bintang!";
   const conceptText = levelDef
     ? levelDef.concepts
         .map((c) =>
-          c === "MOVE" || c === "boti_move"
+          c === "MOVE" || c === "boti_move" || c === "cipi_move"
             ? "Langkah Maju"
-            : c === "TURN" || c === "boti_turn"
+            : c === "TURN" || c === "boti_turn" || c === "cipi_turn"
             ? "Arah Belok"
             : c === "SEQUENCE"
             ? "Urutan Langkah"
@@ -545,19 +583,6 @@ export function LevelPlayer({
 
         {/* Target HUD & Back Button */}
         <div className="relative z-10 flex flex-wrap sm:flex-col items-start sm:items-end gap-2.5">
-          <div className="flex items-center gap-2.5 bg-white/20 rounded-2xl px-4 py-2 border border-white/30 backdrop-blur-xs shadow-xs">
-            <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center text-white shrink-0">
-              <Target className="h-4.5 w-4.5 text-white" />
-            </div>
-            <div className="text-left sm:text-right">
-              <p className="text-[10px] sm:text-xs text-emerald-100 font-bold uppercase tracking-wider">
-                Target Bintang
-              </p>
-              <p className="font-black text-white text-sm sm:text-base tracking-tight">
-                ({activeLevel.goal.x}, {activeLevel.goal.y})
-              </p>
-            </div>
-          </div>
 
           {/* Button to return to Island Map */}
           <Link

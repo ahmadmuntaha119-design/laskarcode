@@ -11,28 +11,28 @@ export interface AvatarOption {
 export const AVATAR_OPTIONS: readonly AvatarOption[] = [
   {
     id: "boti_explorer",
-    name: "Boti Penjelajah",
+    name: "Cipi Penjelajah",
     tagline: "Pemberani & siap menjelajah",
     badgeColor: "bg-amber-100 text-amber-900 border-amber-300",
     accentColor: "#F0BE75",
   },
   {
     id: "boti_guardian",
-    name: "Boti Pelindung",
+    name: "Cipi Pelindung",
     tagline: "Tangguh menjaga teman & alam",
     badgeColor: "bg-emerald-100 text-emerald-900 border-emerald-300",
     accentColor: "#9DCEBC",
   },
   {
     id: "boti_thinker",
-    name: "Boti Pemikir",
+    name: "Cipi Pemikir",
     tagline: "Cerdas memecahkan teka-teki",
     badgeColor: "bg-purple-100 text-purple-900 border-purple-300",
     accentColor: "#A78BFA",
   },
   {
     id: "boti_star",
-    name: "Boti Bintang",
+    name: "Cipi Bintang",
     tagline: "Penuh semangat meraih bintang",
     badgeColor: "bg-amber-100 text-amber-900 border-amber-300",
     accentColor: "#F59E0B",
@@ -100,7 +100,7 @@ export function getAvatarTheme(avatarId?: string): AvatarTheme {
   };
 }
 
-export function BotiAvatarIcon({
+export function CipiAvatarIcon({
   avatarId,
   className = "w-16 h-16",
 }: {
@@ -232,3 +232,5 @@ export function BotiAvatarIcon({
     </svg>
   );
 }
+
+export const BotiAvatarIcon = CipiAvatarIcon;

@@ -43,7 +43,7 @@ export function FeedbackBanner({
             <Sparkles className="h-5 w-5" />
           </div>
           <div className="flex-1">
-            <h4 className="font-black text-sm text-[#087F5B]">Hebat, Boti sampai ke Bintang!</h4>
+            <h4 className="font-black text-sm text-[#087F5B]">Hebat, Cipi sampai ke Bintang!</h4>
             <p className="text-xs text-[#099268] font-medium">
               Kamu berhasil menemukan instruksi yang tepat.
             </p>
@@ -60,8 +60,8 @@ export function FeedbackBanner({
           </div>
         </div>
         {saveNotice && (
-          <div className="text-xs font-bold text-[#C92A2A] bg-[#FF8787]/15 border border-[#FF8787]/30 rounded-xl px-3 py-1.5 flex items-center gap-1.5">
-            <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-[#FA5252]" />
+          <div className="text-[11px] font-bold text-[#B45309] bg-[#FFF4E5] border border-[#F59F00]/30 rounded-xl px-3 py-1.5 flex items-center gap-1.5">
+            <Info className="h-3.5 w-3.5 shrink-0 text-[#F59F00]" />
             <span>{saveNotice}</span>
           </div>
         )}
@@ -78,12 +78,12 @@ export function FeedbackBanner({
           </div>
           <div>
             <h4 className="font-black text-sm text-[#C92A2A]">
-              {collisions > 0 ? "Jalan Boti terhalang" : "Yuk, coba lagi!"}
+              {collisions > 0 ? "Jalan Cipi terhalang" : "Yuk, coba lagi!"}
             </h4>
             <p className="text-xs text-[#E03131] font-medium mt-0.5">
               {collisions > 0
-                ? "Boti menyentuh batas grid. Periksa kembali arah dan jumlah langkah Boti."
-                : "Boti belum mencapai target. Periksa kembali urutan langkahmu."}
+                ? "Cipi menyentuh batas grid. Periksa kembali arah dan jumlah langkah Cipi."
+                : "Cipi belum mencapai target. Periksa kembali urutan langkahmu."}
             </p>
           </div>
         </div>
@@ -104,7 +104,7 @@ export function FeedbackBanner({
           <Loader2 className="h-5 w-5 animate-spin" />
         </div>
         <div className="text-xs sm:text-sm font-medium">
-          <p className="font-extrabold text-[#087F5B]">Boti sedang bergerak...</p>
+          <p className="font-extrabold text-[#087F5B]">Cipi sedang bergerak...</p>
           <p className="text-[#099268]">Memeriksa setiap langkah yang kamu susun.</p>
         </div>
       </div>

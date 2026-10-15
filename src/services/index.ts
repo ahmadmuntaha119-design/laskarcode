@@ -8,3 +8,4 @@ export * from './levelService';
 export * from './progressService';
 export * from './masteryService';
 export * from './guestProfileService';
+export * from './aiInteractionService';

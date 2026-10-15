@@ -40,6 +40,7 @@ function IslandPageSkeleton() {
 
 export function generateStaticParams() {
   return [
+    { islandSlug: "desa-cipi" },
     { islandSlug: "desa-boti" },
     { islandSlug: "hutan-pola" },
   ];
@@ -128,8 +129,27 @@ async function IslandPageContent({
     console.warn("Gagal memuat progress pemain:", err);
   }
 
-  // Build progressMap
+  // Build progressMap: merge local cookie fallback (offline resilience) with Supabase database progress
   const progressMap: Record<string, LevelProgress> = {};
+
+  try {
+    const { cookies } = await import("next/headers");
+    const cookieStore = await cookies();
+    const fallbackCookie = cookieStore.get("laskarcode_guest_progress")?.value;
+    if (fallbackCookie) {
+      const parsed = JSON.parse(fallbackCookie);
+      for (const [code, val] of Object.entries(parsed)) {
+        const v = val as { status?: "COMPLETED" | "IN_PROGRESS" | "NOT_STARTED"; stars?: number };
+        progressMap[code] = {
+          status: v.status ?? "COMPLETED",
+          stars: v.stars ?? 1,
+        };
+      }
+    }
+  } catch {
+    // Abaikan jika parsing cookie gagal
+  }
+
   for (const p of playerProgress) {
     if (p.levelCode) {
       progressMap[p.levelCode] = {

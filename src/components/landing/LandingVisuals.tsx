@@ -1,12 +1,12 @@
 import React from "react";
-import { BotiAvatarIcon } from "@/components/profile/avatars";
+import { CipiAvatarIcon } from "@/components/profile/avatars";
 import { Star, ArrowRight, CornerDownRight } from "lucide-react";
 
 /**
- * HeroBotiStage — The whimsical, lively casual game stage for Boti in the Hero section.
- * Shows Boti as the energetic companion surrounded by tactile coding blocks and stars.
+ * HeroCipiStage — The whimsical, lively casual game stage for Cipi in the Hero section.
+ * Shows Cipi as the energetic companion surrounded by tactile coding blocks and stars.
  */
-export function HeroBotiStage() {
+export function HeroCipiStage() {
   return (
     <div className="relative w-full max-w-md mx-auto aspect-square flex items-center justify-center select-none">
       {/* Decorative ambient background glows */}
@@ -17,9 +17,9 @@ export function HeroBotiStage() {
         {/* Inner concentric ring */}
         <div className="w-full h-full rounded-full border-2 border-dashed border-emerald-200/80 flex items-center justify-center bg-linear-to-b from-[#F0FDF4]/60 to-[#F7FEE7]/40 relative">
           
-          {/* Main Boti character */}
+          {/* Main Cipi character */}
           <div className="relative z-10 transition-transform duration-300 hover:scale-105 active:scale-95 cursor-pointer">
-            <BotiAvatarIcon avatarId="boti_explorer" className="w-36 h-36 sm:w-44 sm:h-44 drop-shadow-md" />
+            <CipiAvatarIcon avatarId="boti_explorer" className="w-36 h-36 sm:w-44 sm:h-44 drop-shadow-md" />
             
             {/* Mascot shadow on platform */}
             <div className="w-28 h-4 mx-auto -mt-2 bg-emerald-950/15 rounded-full blur-[2px]" />
@@ -60,13 +60,15 @@ export function HeroBotiStage() {
           {/* Floating Widget 4: Destination Badge (Bottom-Left) */}
           <div className="absolute -bottom-2 -left-3 sm:-left-5 bg-white rounded-2xl px-3 py-1.5 border-2 border-rose-300 shadow-lg shadow-rose-500/15 flex items-center gap-1.5 rotate-[5deg] animate-bounce [animation-duration:4.5s]">
             <span className="text-sm">🏝️</span>
-            <span className="text-xs font-extrabold text-slate-800">Pulau Boti</span>
+            <span className="text-xs font-extrabold text-slate-800">Pulau Cipi</span>
           </div>
         </div>
       </div>
     </div>
   );
 }
+
+export const HeroBotiStage = HeroCipiStage;
 
 /**
  * Custom illustrations for the 3 Learning Benefits

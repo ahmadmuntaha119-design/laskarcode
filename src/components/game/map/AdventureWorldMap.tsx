@@ -11,7 +11,6 @@ import {
   Sparkles,
   Star,
   MapPin,
-  Compass,
   Trophy,
 } from "lucide-react";
 import type { LevelDefinition } from "@/game/levels/types";
@@ -39,7 +38,7 @@ export function AdventureWorldMap({
   className = "",
 }: AdventureWorldMapProps) {
   const avatarOption = AVATAR_OPTIONS.find((a) => a.id === profile.avatarId);
-  const companionName = avatarOption ? avatarOption.name : "Sahabat Boti";
+  const companionName = avatarOption ? avatarOption.name : "Sahabat Cipi";
 
   // Compute island progress summaries
   const desaBotiSummary = getIslandSummary("desa-boti", progressMap);
@@ -133,10 +132,6 @@ export function AdventureWorldMap({
 
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="inline-flex items-center gap-1 rounded-full bg-white/20 px-3 py-0.5 text-xs font-bold text-white backdrop-blur-xs">
-                <Compass className="h-3 w-3" />
-                Peta Petualangan LaskarCode
-              </span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
               Halo, Petualang {profile.nickname}!
@@ -201,8 +196,8 @@ export function AdventureWorldMap({
             <p className="text-xs text-[#64748B] flex items-center gap-1.5 mt-0.5">
               <MapPin className="w-3.5 h-3.5 text-[#12B886]" />
               <span>
-                {latestLevel.islandSlug === "desa-boti"
-                  ? "Pulau 1 • Desa Boti"
+                {latestLevel.islandSlug === "desa-boti" || latestLevel.islandSlug === "desa-cipi"
+                  ? "Pulau 1 • Desa Cipi"
                   : "Pulau 2 • Hutan Pola"}
               </span>
             </p>
@@ -229,14 +224,14 @@ export function AdventureWorldMap({
             Dunia Kepulauan LaskarCode
           </h2>
           <p className="text-xs sm:text-sm text-[#64748B] mt-1">
-            Selesaikan misi di Desa Boti untuk membuka jembatan menuju Hutan Pola!
+            Selesaikan misi di Desa Cipi untuk membuka jembatan menuju Hutan Pola!
           </p>
         </div>
 
         {/* Desktop Grid (2 Islands) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch relative">
           {/* ========================================================= */}
-          {/* PULAU 1: DESA BOTI */}
+          {/* PULAU 1: DESA CIPI */}
           {/* ========================================================= */}
           <div
             id="island-card-desa-boti"
@@ -247,28 +242,14 @@ export function AdventureWorldMap({
               <div className="relative h-48 sm:h-56 w-full rounded-2xl overflow-hidden mb-4 bg-emerald-50 border border-[#12B886]/20 shadow-inner">
                 <Image
                   src="/images/islands/island-desa-boti.webp"
-                  alt="Pulau Desa Boti"
+                  alt="Pulau Desa Cipi"
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-500"
                   priority
                 />
                 <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent" />
 
-                {/* Status Badge (Typo fixed: Sedang Dijelajahi) */}
-                <div className="absolute top-3 left-3">
-                  {desaBotiSummary?.isCompleted ? (
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-[#12B886] px-3 py-1 text-xs font-bold text-white shadow-xs">
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                      Pulau Selesai
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-[#087F5B] px-3 py-1 text-xs font-bold text-white shadow-xs">
-                      <MapPin className="w-3.5 h-3.5 text-white" />
-                      Sedang Dijelajahi
-                    </span>
-                  )}
-                </div>
-
+                
                 {/* Stars Collected Badge (Crisp navy text, cheerful lemon star) */}
                 <div className="absolute top-3 right-3 rounded-full bg-white/95 px-3 py-1 text-xs font-bold text-[#26334D] flex items-center gap-1.5 shadow-xs border border-[#E8EDF5] backdrop-blur-xs">
                   <Star className="w-3.5 h-3.5 fill-[#FFD43B] text-[#F59F00]" />
@@ -280,13 +261,13 @@ export function AdventureWorldMap({
                   <span className="inline-block px-2.5 py-0.5 rounded-md bg-black/45 backdrop-blur-xs text-[10px] font-extrabold uppercase tracking-wider text-emerald-200 mb-1">
                     Pulau 1 • Tahap Pemula
                   </span>
-                  <h3 className="text-xl sm:text-2xl font-black drop-shadow-md">Desa Boti</h3>
+                  <h3 className="text-xl sm:text-2xl font-black drop-shadow-md">Desa Cipi</h3>
                 </div>
               </div>
 
               {/* Description */}
               <p className="text-xs sm:text-sm text-[#64748B] leading-relaxed mb-4">
-                Petualangan perdana Boti mempelajari instruksi dasar, urutan langkah (sequence), dan arah belok.
+                Petualangan perdana Cipi mempelajari instruksi dasar, urutan langkah (sequence), dan arah belok.
               </p>
 
               {/* Level Progress Visual Meter */}
@@ -314,7 +295,7 @@ export function AdventureWorldMap({
               href="/map/desa-boti"
               className="w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-[#12B886] hover:bg-[#0fa678] text-white py-3.5 px-4 text-sm font-bold transition-all shadow-[0_4px_0_#087F5B] active:translate-y-1 active:shadow-none cursor-pointer min-h-12"
             >
-              <span>Buka Peta Desa Boti (6 Level)</span>
+              <span>Buka Peta Desa Cipi (6 Level)</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -377,9 +358,6 @@ export function AdventureWorldMap({
                     <div className="w-12 h-12 rounded-2xl bg-white/20 border-2 border-white/40 text-white flex items-center justify-center mb-2 shadow-sm backdrop-blur-xs">
                       <Lock className="w-6 h-6 stroke-[2.5]" />
                     </div>
-                    <p className="text-xs font-bold text-white max-w-[220px] drop-shadow-sm leading-snug">
-                      Selesaikan 6 level di Desa Boti untuk membuka pulau ini!
-                    </p>
                   </div>
                 )}
 
@@ -430,7 +408,7 @@ export function AdventureWorldMap({
                 className="w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-100 border-2 border-slate-200 text-slate-400 py-3.5 px-4 text-sm font-bold cursor-not-allowed min-h-12"
               >
                 <Lock className="w-4 h-4 text-slate-400" />
-                <span>Buka Desa Boti Dulu</span>
+                <span>Buka Desa Cipi Dulu</span>
               </div>
             ) : (
               <Link
@@ -456,8 +434,8 @@ export function AdventureWorldMap({
             }
             message={
               isHutanPolaLocked
-                ? "Jembatan menuju Hutan Pola akan terbuka otomatis setelah kamu menaklukkan tantangan terakhir di Desa Boti (Level 1.6). Semangat belajar codingnya ya!"
-                : "Hebat! Kamu telah membuka akses ke seluruh kepulauan LaskarCode. Kamu bisa menjelajahi Desa Boti maupun Hutan Pola kapan saja!"
+                ? "Jembatan menuju Hutan Pola akan terbuka otomatis setelah kamu menaklukkan tantangan terakhir di Desa Cipi (Level 1.6). Semangat belajar codingnya ya!"
+                : "Hebat! Kamu telah membuka akses ke seluruh kepulauan LaskarCode. Kamu bisa menjelajahi Desa Cipi maupun Hutan Pola kapan saja!"
             }
           />
 

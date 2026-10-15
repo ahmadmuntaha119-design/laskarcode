@@ -30,9 +30,9 @@ export function RecoverProfileForm() {
     }
 
     // Cek format dasar
-    const formatRegex = /^BOTI-[2-9A-HJ-NP-Z]{4}-[2-9A-HJ-NP-Z]{2}$/i;
+    const formatRegex = /^(CIPI|BOTI)-[2-9A-HJ-NP-Z]{4}-[2-9A-HJ-NP-Z]{2}$/i;
     if (!formatRegex.test(trimmed)) {
-      setError("Kode belum cocok. Contoh format: BOTI-7K4P-92");
+      setError("Kode belum cocok. Contoh format: CIPI-7K4P-92");
       return;
     }
 
@@ -117,11 +117,11 @@ export function RecoverProfileForm() {
             disabled={isPending}
             value={code}
             onChange={handleCodeChange}
-            placeholder="BOTI-XXXX-XX"
+            placeholder="CIPI-XXXX-XX"
             className="w-full font-mono text-center tracking-widest text-lg font-bold rounded-2xl border-2 border-[#E8EDF5] px-4 py-3.5 text-[#26334D] placeholder:text-slate-400 focus:border-[#12B886] focus:ring-4 focus:ring-[#12B886]/15 focus:outline-none transition-all uppercase disabled:bg-slate-50 min-h-13"
           />
           <p className="mt-1.5 text-[11px] text-[#64748B] text-center">
-            Format: <strong>BOTI-XXXX-XX</strong> (contoh: <code>BOTI-7K4P-92</code>)
+            Format: <strong>CIPI-XXXX-XX</strong> (contoh: <code>CIPI-7K4P-92</code>)
           </p>
         </div>
 

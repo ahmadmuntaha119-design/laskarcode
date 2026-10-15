@@ -15,7 +15,7 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Peta Petualangan Dunia — LaskarCode",
-  description: "Jelajahi Pulau Desa Boti dan Hutan Pola bersama sahabat robot Boti.",
+  description: "Jelajahi Pulau Desa Cipi dan Hutan Pola bersama sahabat robot Cipi.",
 };
 
 function MapPageSkeleton() {

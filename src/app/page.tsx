@@ -258,7 +258,7 @@ export default function Home() {
 
             {/* Subtitle */}
             <p className="mt-4 text-base sm:text-lg lg:text-xl text-candy-muted font-medium max-w-xl leading-relaxed">
-              Bantu <strong>Boti</strong> menjelajah dunia, menyelesaikan tantangan, dan belajar menyusun instruksi pertamanya.
+              Bantu <strong>Cipi</strong> menjelajah dunia, menyelesaikan tantangan, dan belajar menyusun instruksi pertamanya.
             </p>
 
             {/* CTA Buttons */}
@@ -324,7 +324,7 @@ export default function Home() {
                   Susun Blok Coding
                 </h3>
                 <p className="mt-2.5 text-sm text-candy-muted leading-relaxed">
-                  Belajar memberi instruksi dengan balok visual berwarna-warni tanpa perlu mengetik kode rumit. Tarik, pasang, dan jalankan petunjuk arah Boti!
+                  Belajar memberi instruksi dengan balok visual berwarna-warni tanpa perlu mengetik kode rumit. Tarik, pasang, dan jalankan petunjuk arah Cipi!
                 </p>
               </div>
               <div className="mt-6 pt-4 border-t border-emerald-50 flex items-center gap-1.5 text-xs font-bold text-emerald-700">
@@ -333,17 +333,17 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Card 2: Jelajahi Dunia Boti */}
+            {/* Card 2: Jelajahi Dunia Cipi */}
             <div className="group rounded-3xl bg-white p-7 sm:p-8 border-2 border-sky-100 hover:border-sky-300 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between">
               <div>
                 <div className="mb-5 transition-transform duration-300 group-hover:scale-105">
                   <BenefitWorldIllustration />
                 </div>
                 <h3 className="text-xl font-extrabold text-candy-text">
-                  Jelajahi Dunia Boti
+                  Jelajahi Dunia Cipi
                 </h3>
                 <p className="mt-2.5 text-sm text-candy-muted leading-relaxed">
-                  Pecahkan teka-teki seru di Pulau Desa Boti dan Hutan Pola. Setiap level menyuguhkan jalur berliku yang memancing imajinasi dan rasa penasaran.
+                  Pecahkan teka-teki seru di Pulau Desa Cipi dan Hutan Pola. Setiap level menyuguhkan jalur berliku yang memancing imajinasi dan rasa penasaran.
                 </p>
               </div>
               <div className="mt-6 pt-4 border-t border-sky-50 flex items-center gap-1.5 text-xs font-bold text-sky-700">
@@ -362,7 +362,7 @@ export default function Home() {
                   Belajar dari Kesalahan
                 </h3>
                 <p className="mt-2.5 text-sm text-candy-muted leading-relaxed">
-                  Jalan Boti terhalang rintangan? Tidak masalah! Anak diajak mencoba kembali dengan berani, melatih daya juang dan pemecahan masalah tanpa rasa takut salah.
+                  Jalan Cipi terhalang rintangan? Tidak masalah! Anak diajak mencoba kembali dengan berani, melatih daya juang dan pemecahan masalah tanpa rasa takut salah.
                 </p>
               </div>
               <div className="mt-6 pt-4 border-t border-rose-50 flex items-center gap-1.5 text-xs font-bold text-rose-700">
@@ -403,7 +403,7 @@ export default function Home() {
                   01
                 </div>
                 <h3 className="text-xl font-extrabold text-candy-text">
-                  Pilih Sahabat Boti
+                  Pilih Sahabat Cipi
                 </h3>
                 <p className="mt-2 text-sm text-candy-muted leading-relaxed">
                   Buat profil petualang dengan nama panggilan dan karakter robot favoritmu. Bebas dari email atau kata sandi yang sulit diingat anak.
@@ -425,7 +425,7 @@ export default function Home() {
                   Susun Balok Arah
                 </h3>
                 <p className="mt-2 text-sm text-candy-muted leading-relaxed">
-                  Bantu Boti dengan menyusun balok instruksi: maju, belok kanan, dan belok kiri untuk menemukan rute paling tepat mencapai bintang sasaran.
+                  Bantu Cipi dengan menyusun balok instruksi: maju, belok kanan, dan belok kiri untuk menemukan rute paling tepat mencapai bintang sasaran.
                 </p>
               </div>
               <div className="mt-6 pt-4 border-t border-candy-border/60 text-xs font-bold text-sky-800 flex items-center gap-1.5">
@@ -444,7 +444,7 @@ export default function Home() {
                   Raih Bintang & Buka Pulau
                 </h3>
                 <p className="mt-2 text-sm text-candy-muted leading-relaxed">
-                  Dapatkan hingga 3 bintang di setiap level, selesaikan Desa Boti, dan buka jembatan penyeberangan menuju Pulau Hutan Pola!
+                  Dapatkan hingga 3 bintang di setiap level, selesaikan Desa Cipi, dan buka jembatan penyeberangan menuju Pulau Hutan Pola!
                 </p>
               </div>
               <div className="mt-6 pt-4 border-t border-candy-border/60 text-xs font-bold text-emerald-800 flex items-center gap-1.5">
@@ -476,7 +476,7 @@ export default function Home() {
             </div>
 
             <h2 className="text-2xl sm:text-4xl font-black text-candy-text tracking-tight">
-              Petualangan Boti Menunggumu!
+              Petualangan Cipi Menunggumu!
             </h2>
             <p className="mt-3 text-base sm:text-lg text-candy-muted max-w-xl mx-auto leading-relaxed">
               Yuk, mulai langkah pertamamu dan temukan serunya belajar coding bersama robot sahabatmu.
@@ -501,14 +501,12 @@ export default function Home() {
             <span className="font-black text-base text-candy-text">
               Laskar<span className="text-candy-green">Code</span>
             </span>
-            <span className="text-candy-muted/40">•</span>
-            <span className="text-xs text-candy-muted">
-              Petualangan kecil untuk melatih cara berpikir besar.
-            </span>
+            
+    
           </div>
 
           <div className="text-xs text-candy-muted">
-            <p>© LaskarCode • Game Edukasi Coding Anak SD • Telkomsel Coding Competition</p>
+            <p>© LaskarCode • Game Edukasi Coding Anak SD</p>
           </div>
         </div>
       </footer>

@@ -11,7 +11,7 @@ import { ConfigurationError } from '@/services/types';
 const CROCKFORD_SAFE_ALPHABET = '23456789ABCDEFGHJKMNPQRSTVWXYZ';
 
 /**
- * Schema format Kode Petualangan (Recovery Code) sesuai Dokumen Acuan §21 (misal BOTI-7K4P-92).
+ * Schema format Kode Petualangan (Recovery Code) sesuai Dokumen Acuan §21 (misal CIPI-7K4P-92 atau BOTI-7K4P-92).
  */
 export const recoveryCodeFormatSchema = z
   .string()
@@ -19,13 +19,13 @@ export const recoveryCodeFormatSchema = z
   .min(1, 'Kode Petualangan tidak boleh kosong')
   .max(30, 'Kode Petualangan terlalu panjang')
   .regex(
-    /^BOTI-[2-9A-HJ-NP-Z]{4}-[2-9A-HJ-NP-Z]{2}$/i,
-    'Format Kode Petualangan tidak valid. Contoh format: BOTI-7K4P-92'
+    /^(CIPI|BOTI)-[2-9A-HJ-NP-Z]{4}-[2-9A-HJ-NP-Z]{2}$/i,
+    'Format Kode Petualangan tidak valid. Contoh format: CIPI-7K4P-92'
   );
 
 /**
  * Menghasilkan Kode Petualangan baru dengan cryptographically secure randomness.
- * Format: BOTI-XXXX-XX (6 karakter Base32 acak = 30^6 = ~729 juta kombinasi)
+ * Format: CIPI-XXXX-XX (6 karakter Base32 acak = 30^6 = ~729 juta kombinasi)
  */
 export function generateRecoveryCode(): string {
   const bytes = randomBytes(6);
@@ -42,7 +42,7 @@ export function generateRecoveryCode(): string {
     part2 += CROCKFORD_SAFE_ALPHABET[index];
   }
 
-  return `BOTI-${part1}-${part2}`;
+  return `CIPI-${part1}-${part2}`;
 }
 
 /**

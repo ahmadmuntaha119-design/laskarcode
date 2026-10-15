@@ -12,7 +12,7 @@ import type { LevelDefinition } from "./types";
 export type ProgressionState = {
   activeLevelCode: string;
   progress: Record<string, LevelProgress>;
-  setActiveLevelCode: (code: string) => boolean;
+  setActiveLevelCode: (code: string, force?: boolean) => boolean;
   completeLevel: (code: string, stars?: number) => void;
   markInProgress: (code: string) => void;
   getActiveLevel: () => LevelDefinition;
@@ -40,19 +40,21 @@ export const useProgressionStore = create<ProgressionState>((set, get) => ({
   activeLevelCode: "1.1",
   progress: INITIAL_PROGRESS,
 
-  setActiveLevelCode: (code: string) => {
+  setActiveLevelCode: (code: string, force = false) => {
     const level = getLevelByCode(code);
     if (!level) return false;
 
-    const completedCodes = new Set(
-      Object.entries(get().progress)
-        .filter(([, p]) => p.status === "COMPLETED")
-        .map(([c]) => c)
-    );
+    if (!force) {
+      const completedCodes = new Set(
+        Object.entries(get().progress)
+          .filter(([, p]) => p.status === "COMPLETED")
+          .map(([c]) => c)
+      );
 
-    // Only allow selection if level is unlocked
-    if (!isLevelUnlocked(code, completedCodes)) {
-      return false;
+      // Only allow selection if level is unlocked
+      if (!isLevelUnlocked(code, completedCodes)) {
+        return false;
+      }
     }
 
     set({ activeLevelCode: code });

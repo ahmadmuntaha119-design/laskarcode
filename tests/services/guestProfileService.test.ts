@@ -125,8 +125,8 @@ describe('GuestProfileService & Recovery Code Tests', () => {
     expect(result.profile.nickname).toBe('BudiPetualang');
     expect(result.profile.avatarId).toBe('boti_hero');
 
-    // Recovery code berformat anak-facing BOTI-XXXX-XX
-    expect(result.recoveryCode).toMatch(/^BOTI-[2-9A-HJ-NP-Z]{4}-[2-9A-HJ-NP-Z]{2}$/);
+    // Recovery code berformat anak-facing CIPI-XXXX-XX (mendukung legacy BOTI-XXXX-XX)
+    expect(result.recoveryCode).toMatch(/^(CIPI|BOTI)-[2-9A-HJ-NP-Z]{4}-[2-9A-HJ-NP-Z]{2}$/);
 
     // Cookie sesi diset
     const sessionCookie = cookieStore.get(GUEST_SESSION_COOKIE_NAME);

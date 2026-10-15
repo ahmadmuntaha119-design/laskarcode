@@ -54,7 +54,7 @@ describe("Level Catalog & Validation", () => {
   });
 
   it("retrieves level by code correctly and returns undefined for unknown codes", () => {
-    expect(getLevelByCode("1.1")?.title).toBe("Boti Mau Maju");
+    expect(getLevelByCode("1.1")?.title).toBe("Cipi Mau Maju");
     expect(getLevelByCode("2.6")?.title).toBe("Master Challenge");
     expect(getLevelByCode("9.9")).toBeUndefined();
   });

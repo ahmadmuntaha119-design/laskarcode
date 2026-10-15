@@ -2,7 +2,7 @@
 
 import React, { useTransition } from "react";
 import Link from "next/link";
-import { LogOut, Loader2, ShieldCheck } from "lucide-react";
+import { LogOut, Loader2 } from "lucide-react";
 import { BotiAvatarIcon } from "@/components/profile/avatars";
 import { logoutPlayerProfileAction } from "@/app/actions/profileActions";
 import type { ProfileDTO } from "@/services/guestProfileService";
@@ -38,12 +38,7 @@ export function PlayerHeader({ profile }: PlayerHeaderProps) {
             </span>
           </Link>
 
-          {/* Kid-friendly save status pill */}
-          <div className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-[#12B886]/10 border border-[#12B886]/20 px-3 py-1 text-xs font-bold text-[#087F5B]">
-            <span className="w-2 h-2 rounded-full bg-[#12B886] animate-pulse"></span>
-            <ShieldCheck className="w-3.5 h-3.5 text-[#087F5B]" />
-            <span>Progres Tersimpan</span>
-          </div>
+        
         </div>
 
         {/* Profile Card & Logout */}

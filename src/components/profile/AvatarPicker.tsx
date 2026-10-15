@@ -22,7 +22,7 @@ export function AvatarPicker({
   return (
     <div className="w-full">
       <label className="block text-sm font-bold text-[#26334D] mb-2.5">
-        Pilih Sahabat Robot Boti:
+        Pilih Sahabat Robot Cipi:
       </label>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
         {AVATAR_OPTIONS.map((avatar) => {

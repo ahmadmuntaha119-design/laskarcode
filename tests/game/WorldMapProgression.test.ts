@@ -134,7 +134,7 @@ describe("Task 012.6 — Adventure World Map & Island Progression Tests", () => 
       const progressMap: Record<string, LevelProgress> = {};
       const latest = getLatestPlayableLevel(progressMap);
       expect(latest.code).toBe("1.1");
-      expect(latest.title).toBe("Boti Mau Maju");
+      expect(latest.title).toBe("Cipi Mau Maju");
     });
 
     it("Returns Level 1.2 when Level 1.1 is finished", () => {
@@ -185,7 +185,7 @@ describe("Task 012.6 — Adventure World Map & Island Progression Tests", () => 
     it("getIslandBySlug retrieves correct island definition", () => {
       const desaBoti = getIslandBySlug("desa-boti");
       expect(desaBoti).toBeDefined();
-      expect(desaBoti?.name).toBe("Pulau 1 — Desa Boti");
+      expect(desaBoti?.name).toBe("Pulau 1 — Desa Cipi");
       expect(desaBoti?.levelCodes).toHaveLength(6);
 
       const hutanPola = getIslandBySlug("hutan-pola");

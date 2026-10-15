@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "LaskarCode — Petualangan Belajar Coding Anak SD",
-  description: "Bantu Boti menjelajah dunia, menyelesaikan tantangan, dan belajar menyusun instruksi pertamanya. Game edukasi coding ramah anak.",
+  description: "Bantu Cipi menjelajah dunia, menyelesaikan tantangan, dan belajar menyusun instruksi pertamanya. Game edukasi coding ramah anak.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
