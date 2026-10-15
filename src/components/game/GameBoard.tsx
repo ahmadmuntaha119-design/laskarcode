@@ -45,11 +45,11 @@ export function GameBoard({
 
   return (
     <div
-      className={`relative flex w-full items-center justify-center overflow-hidden rounded-2xl border-2 border-slate-200 bg-slate-100 p-2 shadow-sm ${className}`}
+      className={`relative flex w-full items-center justify-center overflow-hidden rounded-3xl border-2 border-[#E8EDF5] bg-white p-3 shadow-xs ${className}`}
     >
       <canvas
         ref={canvasRef}
-        className="max-h-115 w-full rounded-xl touch-none select-none"
+        className="max-h-115 w-full rounded-2xl touch-none select-none"
       />
     </div>
   );

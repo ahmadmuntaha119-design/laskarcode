@@ -2,7 +2,7 @@
 
 import React, { useTransition } from "react";
 import Link from "next/link";
-import { LogOut, Loader2, Database, ShieldCheck } from "lucide-react";
+import { LogOut, Loader2, ShieldCheck } from "lucide-react";
 import { BotiAvatarIcon } from "@/components/profile/avatars";
 import { logoutPlayerProfileAction } from "@/app/actions/profileActions";
 import type { ProfileDTO } from "@/services/guestProfileService";
@@ -12,11 +12,11 @@ interface PlayerHeaderProps {
   levelCount: number;
 }
 
-export function PlayerHeader({ profile, levelCount }: PlayerHeaderProps) {
+export function PlayerHeader({ profile }: PlayerHeaderProps) {
   const [isLoggingOut, startTransition] = useTransition();
 
   const handleLogout = () => {
-    if (confirm("Apakah kamu yakin ingin keluar dari petualangan ini? Pastikan kamu sudah mencatat Kode Petualanganmu!")) {
+    if (confirm("Apakah kamu ingin keluar dari petualangan ini? Pastikan kamu sudah mencatat Kode Petualanganmu ya!")) {
       startTransition(async () => {
         await logoutPlayerProfileAction();
       });
@@ -24,7 +24,7 @@ export function PlayerHeader({ profile, levelCount }: PlayerHeaderProps) {
   };
 
   return (
-    <header className="w-full bg-white border-b border-slate-200 px-4 py-3 mb-4 rounded-2xl shadow-xs">
+    <header className="w-full bg-white border-2 border-[#E8EDF5] px-4 py-3 mb-4 rounded-2xl shadow-xs">
       <div className="flex flex-wrap items-center justify-between gap-3">
         {/* Brand & Home Link */}
         <div className="flex items-center gap-3">
@@ -32,28 +32,27 @@ export function PlayerHeader({ profile, levelCount }: PlayerHeaderProps) {
             href="/"
             className="flex items-center gap-2 group transition-transform active:scale-95"
           >
-            <BotiAvatarIcon avatarId="boti_default" className="w-8 h-8" />
-            <span className="font-black text-lg text-slate-900 group-hover:text-emerald-600 transition-colors">
-              Laskar<span className="text-emerald-600">Code</span>
+            <BotiAvatarIcon avatarId="boti_explorer" className="w-8 h-8" />
+            <span className="font-black text-lg text-[#26334D] group-hover:text-[#12B886] transition-colors">
+              Laskar<span className="text-[#12B886]">Code</span>
             </span>
           </Link>
 
-          {/* Database status pill */}
-          <div className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 text-[11px] font-bold text-emerald-800">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <Database className="w-3 h-3 text-emerald-600" />
-            <span>Supabase Sync ({levelCount} Level)</span>
+          {/* Kid-friendly save status pill */}
+          <div className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-[#12B886]/10 border border-[#12B886]/20 px-3 py-1 text-xs font-bold text-[#087F5B]">
+            <span className="w-2 h-2 rounded-full bg-[#12B886] animate-pulse"></span>
+            <ShieldCheck className="w-3.5 h-3.5 text-[#087F5B]" />
+            <span>Progres Tersimpan</span>
           </div>
         </div>
 
         {/* Profile Card & Logout */}
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 rounded-full bg-slate-100 border border-slate-200 py-1 px-3">
+          <div className="flex items-center gap-2 rounded-full bg-[#FFFDF7] border border-[#E8EDF5] py-1 px-3">
             <BotiAvatarIcon avatarId={profile.avatarId} className="w-6 h-6" />
-            <span className="text-xs font-bold text-slate-900">
+            <span className="text-xs font-bold text-[#26334D]">
               {profile.nickname}
             </span>
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 ml-0.5" />
           </div>
 
           <button
@@ -61,7 +60,7 @@ export function PlayerHeader({ profile, levelCount }: PlayerHeaderProps) {
             disabled={isLoggingOut}
             onClick={handleLogout}
             title="Keluar dari sesi ini"
-            className="inline-flex items-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50/70 hover:bg-rose-100 px-3 py-1.5 text-xs font-bold text-rose-700 transition-colors cursor-pointer active:scale-95 disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-[#FF8787]/30 bg-[#FF8787]/15 hover:bg-[#FF8787]/25 px-3.5 py-1.5 text-xs font-bold text-[#FA5252] transition-colors cursor-pointer active:scale-95 disabled:opacity-50 min-h-9.5"
           >
             {isLoggingOut ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -77,3 +76,4 @@ export function PlayerHeader({ profile, levelCount }: PlayerHeaderProps) {
     </header>
   );
 }
+

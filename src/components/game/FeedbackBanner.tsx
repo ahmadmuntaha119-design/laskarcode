@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { AlertTriangle, Info, Sparkles } from "lucide-react";
+import { AlertTriangle, Info, Sparkles, Star, Loader2 } from "lucide-react";
 import type { ControllerStatus } from "@/game/execution";
 
 export type FeedbackBannerProps = {
@@ -23,11 +23,13 @@ export function FeedbackBanner({
 }: FeedbackBannerProps) {
   if (errorMessage) {
     return (
-      <div className="flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-amber-800 shadow-sm animate-in fade-in">
-        <AlertTriangle className="h-6 w-6 shrink-0 text-amber-600" />
-        <div className="text-sm font-medium">
-          <p className="font-bold">Perhatian:</p>
-          <p>{errorMessage}</p>
+      <div className="flex items-center gap-3 rounded-2xl border-2 border-[#F59F00]/35 bg-[#FFF4E5] p-3.5 text-[#B45309] shadow-xs">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#F59F00] text-white shadow-xs">
+          <AlertTriangle className="h-5 w-5" />
+        </div>
+        <div className="text-xs sm:text-sm font-medium">
+          <p className="font-extrabold text-[#78350F]">Periksa Balok Kode:</p>
+          <p className="text-[#92400E]">{errorMessage}</p>
         </div>
       </div>
     );
@@ -36,25 +38,30 @@ export function FeedbackBanner({
   if (status === "SUCCESS" || isGoal) {
     return (
       <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-900 shadow-sm animate-in zoom-in-95">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white shadow">
-            <Sparkles className="h-6 w-6" />
+        <div className="flex items-center gap-3.5 rounded-2xl border-2 border-[#12B886]/35 bg-[#12B886]/10 p-3.5 text-[#087F5B] shadow-xs">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#12B886] text-white shadow-xs">
+            <Sparkles className="h-5 w-5" />
           </div>
-          <div>
-            <h4 className="font-bold text-emerald-800">🎉 Hore! Misi Berhasil!</h4>
-            <p className="text-sm text-emerald-700">
-              Boti berhasil sampai ke bintang target dengan selamat!
+          <div className="flex-1">
+            <h4 className="font-black text-sm text-[#087F5B]">Hebat, Boti sampai ke Bintang!</h4>
+            <p className="text-xs text-[#099268] font-medium">
+              Kamu berhasil menemukan instruksi yang tepat.
             </p>
             {verifiedStars !== null && verifiedStars > 0 && (
-              <p className="text-xs font-bold text-amber-600 mt-1">
-                ⭐ {verifiedStars} Bintang Diperoleh!
-              </p>
+              <div className="flex items-center gap-2 mt-1 text-xs font-black text-[#087F5B]">
+                <div className="flex items-center gap-0.5">
+                  {Array.from({ length: verifiedStars }).map((_, i) => (
+                    <Star key={i} className="h-4 w-4 fill-[#FFE66D] text-[#F59F00]" />
+                  ))}
+                </div>
+                <span>{verifiedStars} Bintang Diperoleh!</span>
+              </div>
             )}
           </div>
         </div>
         {saveNotice && (
-          <div className="text-xs font-semibold text-rose-700 bg-rose-50 border border-rose-200 rounded-lg px-3 py-1.5 flex items-center gap-1.5">
-            <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+          <div className="text-xs font-bold text-[#C92A2A] bg-[#FF8787]/15 border border-[#FF8787]/30 rounded-xl px-3 py-1.5 flex items-center gap-1.5">
+            <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-[#FA5252]" />
             <span>{saveNotice}</span>
           </div>
         )}
@@ -65,22 +72,24 @@ export function FeedbackBanner({
   if (status === "FAILED") {
     return (
       <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-3 rounded-xl border border-rose-200 bg-rose-50 p-4 text-rose-900 shadow-sm animate-in fade-in">
-          <AlertTriangle className="h-6 w-6 shrink-0 text-rose-600" />
+        <div className="flex items-center gap-3.5 rounded-2xl border-2 border-[#FF8787]/35 bg-[#FF8787]/12 p-3.5 text-[#C92A2A] shadow-xs">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#FA5252] text-white shadow-xs">
+            <AlertTriangle className="h-5 w-5" />
+          </div>
           <div>
-            <h4 className="font-bold text-rose-800">
-              {collisions > 0 ? "💥 Boti Menabrak Batas!" : "Belum Sampai Target"}
+            <h4 className="font-black text-sm text-[#C92A2A]">
+              {collisions > 0 ? "Jalan Boti terhalang" : "Yuk, coba lagi!"}
             </h4>
-            <p className="text-sm text-rose-700">
+            <p className="text-xs text-[#E03131] font-medium mt-0.5">
               {collisions > 0
-                ? "Boti menabrak tembok grid. Coba periksa kembali jumlah langkah Maju yang disusun!"
-                : "Boti belum mencapai bintang. Tambahkan lebih banyak langkah untuk sampai!"}
+                ? "Boti menyentuh batas grid. Periksa kembali arah dan jumlah langkah Boti."
+                : "Boti belum mencapai target. Periksa kembali urutan langkahmu."}
             </p>
           </div>
         </div>
         {saveNotice && (
-          <div className="text-xs font-semibold text-rose-700 bg-rose-50 border border-rose-200 rounded-lg px-3 py-1.5 flex items-center gap-1.5">
-            <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+          <div className="text-xs font-bold text-[#C92A2A] bg-[#FF8787]/15 border border-[#FF8787]/30 rounded-xl px-3 py-1.5 flex items-center gap-1.5">
+            <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-[#FA5252]" />
             <span>{saveNotice}</span>
           </div>
         )}
@@ -90,11 +99,13 @@ export function FeedbackBanner({
 
   if (status === "RUNNING") {
     return (
-      <div className="flex items-center gap-3 rounded-xl border border-sky-200 bg-sky-50 p-4 text-sky-900 shadow-sm">
-        <div className="h-5 w-5 animate-spin rounded-full border-2 border-sky-400 border-t-sky-700" />
-        <div className="text-sm font-medium">
-          <p className="font-semibold text-sky-900">Boti sedang bergerak...</p>
-          <p className="text-sky-700">Memeriksa setiap langkah yang kamu susun.</p>
+      <div className="flex items-center gap-3.5 rounded-2xl border-2 border-[#12B886]/25 bg-[#12B886]/10 p-3.5 text-[#087F5B] shadow-xs">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#12B886] text-white shadow-xs">
+          <Loader2 className="h-5 w-5 animate-spin" />
+        </div>
+        <div className="text-xs sm:text-sm font-medium">
+          <p className="font-extrabold text-[#087F5B]">Boti sedang bergerak...</p>
+          <p className="text-[#099268]">Memeriksa setiap langkah yang kamu susun.</p>
         </div>
       </div>
     );
@@ -102,16 +113,17 @@ export function FeedbackBanner({
 
   // IDLE status
   return (
-    <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 text-slate-700 shadow-sm">
-      <Info className="h-5 w-5 shrink-0 text-slate-500" />
-      <div className="text-sm">
-        <span className="font-semibold text-slate-800">Petunjuk Level:</span> Tarik blok{" "}
-        <span className="rounded bg-emerald-100 px-1.5 py-0.5 font-bold text-emerald-800">Maju</span>{" "}
-        dari panel kiri ke area kerja, sambungkan, lalu tekan tombol{" "}
-        <span className="font-bold text-emerald-700">JALANKAN</span>!
+    <div className="flex items-center gap-3.5 rounded-2xl border-2 border-[#4DABF7]/25 bg-[#4DABF7]/10 p-3.5 text-[#1971C2] shadow-xs">
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#4DABF7] text-white shadow-xs">
+        <Info className="h-5 w-5" />
+      </div>
+      <div className="text-xs sm:text-sm font-medium text-[#1864AB]">
+        <span className="font-extrabold text-[#1971C2]">Petunjuk:</span> Tarik balok dari panel kanan, pasang di area kerja, lalu tekan tombol{" "}
+        <span className="font-extrabold text-[#1971C2]">Jalankan</span>!
       </div>
     </div>
   );
 }
 
 export default FeedbackBanner;
+

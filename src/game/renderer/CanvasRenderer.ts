@@ -1,6 +1,7 @@
 import type { BotiState, Direction, Position } from "../types/game";
 import type { LevelConfig } from "../types/level";
 import type { IRenderer, RenderOptions, RendererDimensions } from "./types";
+import { getAvatarTheme } from "@/components/profile/avatars";
 
 export class CanvasRenderer implements IRenderer {
   private readonly canvas: HTMLCanvasElement;
@@ -164,22 +165,15 @@ export class CanvasRenderer implements IRenderer {
         const pad = 3;
 
         ctx.save();
-        // Checkerboard tone
+        // Warm adventure terrain tiles
         const isAlternate = (gx + gy) % 2 === 0;
-        ctx.fillStyle = isAlternate ? "#ffffff" : "#f1f5f9";
-        ctx.strokeStyle = "#cbd5e1";
-        ctx.lineWidth = 1;
+        ctx.fillStyle = isAlternate ? "#FFFFFF" : "#F7F4E9";
+        ctx.strokeStyle = "#E5DFD1";
+        ctx.lineWidth = 1.5;
 
         this.roundRect(ctx, x + pad, y + pad, ts - pad * 2, ts - pad * 2, 8);
         ctx.fill();
         ctx.stroke();
-
-        // Subtle coordinate indicator for kids (optional, friendly notation)
-        ctx.fillStyle = "#94a3b8";
-        ctx.font = `${Math.max(10, Math.floor(ts * 0.18))}px sans-serif`;
-        ctx.textAlign = "left";
-        ctx.textBaseline = "top";
-        ctx.fillText(`${gx},${gy}`, x + pad + 4, y + pad + 3);
 
         ctx.restore();
       }
@@ -292,22 +286,24 @@ export class CanvasRenderer implements IRenderer {
     };
     ctx.rotate(angleMap[direction]);
 
+    const theme = getAvatarTheme(options.avatarId);
+
     // 1. Soft Shadow
     ctx.beginPath();
     ctx.ellipse(0, r * 0.3, r * 0.85, r * 0.45, 0, 0, Math.PI * 2);
-    ctx.fillStyle = "rgba(15, 23, 42, 0.12)";
+    ctx.fillStyle = "rgba(38, 68, 59, 0.12)";
     ctx.fill();
 
     // 2. Robot Ears / Antennae
-    ctx.fillStyle = options.isColliding ? "#ef4444" : "#0284c7";
+    ctx.fillStyle = options.isColliding ? "#EF4444" : theme.earColor;
     ctx.beginPath();
     ctx.arc(0, -r * 0.85, r * 0.22, 0, Math.PI * 2);
     ctx.arc(0, r * 0.85, r * 0.22, 0, Math.PI * 2);
     ctx.fill();
 
     // 3. Main Robot Head/Body (Curved Friendly Pod)
-    ctx.fillStyle = options.isColliding ? "#fee2e2" : options.isGoal ? "#dcfce7" : "#0ea5e9";
-    ctx.strokeStyle = options.isColliding ? "#ef4444" : options.isGoal ? "#16a34a" : "#0284c7";
+    ctx.fillStyle = options.isColliding ? "#FEE2E2" : options.isGoal ? "#DCFCE7" : theme.headColor;
+    ctx.strokeStyle = options.isColliding ? "#EF4444" : options.isGoal ? "#16A34A" : theme.earColor;
     ctx.lineWidth = 2.5;
 
     this.roundRect(ctx, -r * 0.75, -r * 0.75, r * 1.5, r * 1.5, r * 0.45);
@@ -315,35 +311,35 @@ export class CanvasRenderer implements IRenderer {
     ctx.stroke();
 
     // 4. Face Screen (Dark Display Visor)
-    ctx.fillStyle = options.isColliding ? "#7f1d1d" : "#0f172a";
+    ctx.fillStyle = options.isColliding ? "#7F1D1D" : theme.faceColor;
     this.roundRect(ctx, -r * 0.25, -r * 0.55, r * 0.95, r * 1.1, r * 0.3);
     ctx.fill();
 
     // 5. Expressive Eyes
     if (options.isColliding) {
       // Confused / dizzy X eyes
-      ctx.strokeStyle = "#f87171";
+      ctx.strokeStyle = "#F87171";
       ctx.lineWidth = 2;
       this.drawCross(ctx, r * 0.2, -r * 0.25, r * 0.12);
       this.drawCross(ctx, r * 0.2, r * 0.25, r * 0.12);
     } else if (options.isGoal) {
       // Happy curve eyes ^_^
-      ctx.strokeStyle = "#4ade80";
+      ctx.strokeStyle = "#4ADE80";
       ctx.lineWidth = 2.5;
       ctx.beginPath();
       ctx.arc(r * 0.2, -r * 0.25, r * 0.12, Math.PI * 1.1, Math.PI * 1.9);
       ctx.arc(r * 0.2, r * 0.25, r * 0.12, Math.PI * 1.1, Math.PI * 1.9);
       ctx.stroke();
     } else {
-      // Normal friendly cyan glow eyes looking forward
-      ctx.fillStyle = "#38bdf8";
+      // Normal friendly glow eyes looking forward
+      ctx.fillStyle = theme.eyeGlowColor;
       ctx.beginPath();
       ctx.arc(r * 0.25, -r * 0.25, r * 0.14, 0, Math.PI * 2);
       ctx.arc(r * 0.25, r * 0.25, r * 0.14, 0, Math.PI * 2);
       ctx.fill();
 
       // Eye highlights
-      ctx.fillStyle = "#ffffff";
+      ctx.fillStyle = "#FFFFFF";
       ctx.beginPath();
       ctx.arc(r * 0.28, -r * 0.28, r * 0.05, 0, Math.PI * 2);
       ctx.arc(r * 0.28, r * 0.22, r * 0.05, 0, Math.PI * 2);
@@ -351,7 +347,7 @@ export class CanvasRenderer implements IRenderer {
     }
 
     // 6. Direction Pointer / Beak
-    ctx.fillStyle = options.isGoal ? "#22c55e" : "#f59e0b";
+    ctx.fillStyle = options.isGoal ? "#22C55E" : theme.antennaColor;
     ctx.beginPath();
     ctx.moveTo(r * 0.75, 0);
     ctx.lineTo(r * 0.98, -r * 0.16);

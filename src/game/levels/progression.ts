@@ -1,5 +1,5 @@
-import { getAllLevels, getLevelByCode } from "./catalog";
-import type { LevelDefinition } from "./types";
+import { getAllLevels, getIslandBySlug, getLevelByCode } from "./catalog";
+import type { IslandDefinition, LevelDefinition } from "./types";
 
 export type LevelRecordStatus = "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED";
 
@@ -115,5 +115,132 @@ export function calculateStars(
   }
 
   return Math.min(3, Math.max(1, stars));
+}
+
+/**
+ * Returns a set of level codes that have been COMPLETED.
+ */
+export function getCompletedCodes(
+  progressMap: Record<string, LevelProgress>
+): Set<string> {
+  return new Set(
+    Object.entries(progressMap)
+      .filter(([, p]) => p.status === "COMPLETED")
+      .map(([code]) => code)
+  );
+}
+
+export type IslandStatus = "LOCKED" | "AVAILABLE" | "EXPLORING" | "COMPLETED";
+
+export type IslandProgressSummary = {
+  island: IslandDefinition;
+  status: IslandStatus;
+  completedLevels: number;
+  totalLevels: number;
+  earnedStars: number;
+  maxStars: number;
+  isLocked: boolean;
+  isCompleted: boolean;
+  activeLevelCode: string;
+};
+
+/**
+ * Determines whether an island is unlocked based on prerequisites.
+ * Island 1 (Desa Boti) is always unlocked.
+ * Island 2 (Hutan Pola) requires Level 1.6 to be COMPLETED.
+ */
+export function isIslandUnlocked(
+  islandSlug: string,
+  progressMap: Record<string, LevelProgress>
+): boolean {
+  if (islandSlug === "desa-boti") {
+    return true;
+  }
+  if (islandSlug === "hutan-pola") {
+    return progressMap["1.6"]?.status === "COMPLETED";
+  }
+  return false;
+}
+
+/**
+ * Computes runtime progression summary for an island.
+ */
+export function getIslandSummary(
+  islandSlug: string,
+  progressMap: Record<string, LevelProgress>
+): IslandProgressSummary | null {
+  const island = getIslandBySlug(islandSlug);
+  if (!island) return null;
+
+  const unlocked = isIslandUnlocked(islandSlug, progressMap);
+  const completedCodes = getCompletedCodes(progressMap);
+
+  let completedLevels = 0;
+  let earnedStars = 0;
+  let firstPlayableCode: string | null = null;
+
+  for (const code of island.levelCodes) {
+    const record = progressMap[code];
+    if (record?.status === "COMPLETED") {
+      completedLevels++;
+      earnedStars += record.stars || 0;
+    } else if (!firstPlayableCode && isLevelUnlocked(code, completedCodes)) {
+      firstPlayableCode = code;
+    }
+  }
+
+  const totalLevels = island.levelCodes.length;
+  const isCompleted = completedLevels === totalLevels;
+
+  let status: IslandStatus;
+  if (!unlocked) {
+    status = "LOCKED";
+  } else if (isCompleted) {
+    status = "COMPLETED";
+  } else if (
+    completedLevels > 0 ||
+    island.levelCodes.some((c: string) => progressMap[c]?.status === "IN_PROGRESS")
+  ) {
+    status = "EXPLORING";
+  } else {
+    status = "AVAILABLE";
+  }
+
+  const activeLevelCode =
+    firstPlayableCode ||
+    (isCompleted ? island.levelCodes[island.levelCodes.length - 1] : island.levelCodes[0]);
+
+  return {
+    island,
+    status,
+    completedLevels,
+    totalLevels,
+    earnedStars,
+    maxStars: totalLevels * 3,
+    isLocked: !unlocked,
+    isCompleted,
+    activeLevelCode,
+  };
+}
+
+/**
+ * Gets the next playable level for the player (for "Lanjut Petualangan" button).
+ * Finds the first incomplete, unlocked level.
+ * If all are completed, returns the final level ("2.6").
+ */
+export function getLatestPlayableLevel(
+  progressMap: Record<string, LevelProgress>
+): LevelDefinition {
+  const allLevels = getAllLevels();
+  const completed = getCompletedCodes(progressMap);
+
+  for (const lvl of allLevels) {
+    const record = progressMap[lvl.code];
+    if (record?.status !== "COMPLETED" && isLevelUnlocked(lvl.code, completed)) {
+      return lvl;
+    }
+  }
+
+  return allLevels[allLevels.length - 1];
 }
 

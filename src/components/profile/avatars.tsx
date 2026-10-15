@@ -5,46 +5,100 @@ export interface AvatarOption {
   name: string;
   tagline: string;
   badgeColor: string;
-  bgGradient: string;
+  accentColor: string;
 }
 
 export const AVATAR_OPTIONS: readonly AvatarOption[] = [
   {
-    id: "boti_default",
-    name: "Boti Klasik",
-    tagline: "Sahabat Ceria & Ramah",
-    badgeColor: "bg-emerald-100 text-emerald-800 border-emerald-300",
-    bgGradient: "from-emerald-400 to-teal-500",
-  },
-  {
     id: "boti_explorer",
-    name: "Boti Petualang",
-    tagline: "Penjelajah Pulau Seru",
-    badgeColor: "bg-sky-100 text-sky-800 border-sky-300",
-    bgGradient: "from-sky-400 to-blue-500",
+    name: "Boti Penjelajah",
+    tagline: "Pemberani & siap menjelajah",
+    badgeColor: "bg-amber-100 text-amber-900 border-amber-300",
+    accentColor: "#F0BE75",
   },
   {
-    id: "boti_coder",
+    id: "boti_guardian",
+    name: "Boti Pelindung",
+    tagline: "Tangguh menjaga teman & alam",
+    badgeColor: "bg-emerald-100 text-emerald-900 border-emerald-300",
+    accentColor: "#9DCEBC",
+  },
+  {
+    id: "boti_thinker",
     name: "Boti Pemikir",
-    tagline: "Jago Analisis Logika",
-    badgeColor: "bg-purple-100 text-purple-800 border-purple-300",
-    bgGradient: "from-purple-400 to-indigo-500",
+    tagline: "Cerdas memecahkan teka-teki",
+    badgeColor: "bg-purple-100 text-purple-900 border-purple-300",
+    accentColor: "#A78BFA",
   },
   {
     id: "boti_star",
     name: "Boti Bintang",
-    tagline: "Pemberani & Juara",
-    badgeColor: "bg-amber-100 text-amber-800 border-amber-300",
-    bgGradient: "from-amber-400 to-orange-500",
-  },
-  {
-    id: "boti_leaf",
-    name: "Boti Rimba",
-    tagline: "Pelindung Hutan Pola",
-    badgeColor: "bg-teal-100 text-teal-800 border-teal-300",
-    bgGradient: "from-teal-400 to-emerald-600",
+    tagline: "Penuh semangat meraih bintang",
+    badgeColor: "bg-amber-100 text-amber-900 border-amber-300",
+    accentColor: "#F59E0B",
   },
 ];
+
+export interface AvatarTheme {
+  headColor: string;
+  faceColor: string;
+  antennaColor: string;
+  earColor: string;
+  accentColor: string;
+  eyeGlowColor: string;
+  role: "explorer" | "guardian" | "thinker" | "star";
+}
+
+export function getAvatarTheme(avatarId?: string): AvatarTheme {
+  const id = avatarId || "boti_explorer";
+
+  if (id === "boti_guardian" || id === "boti_leaf") {
+    return {
+      headColor: "#3B7A57",
+      faceColor: "#204632",
+      antennaColor: "#9DCEBC",
+      earColor: "#2D5E43",
+      accentColor: "#D9EFE5",
+      eyeGlowColor: "#A7F3D0",
+      role: "guardian",
+    };
+  }
+
+  if (id === "boti_thinker" || id === "boti_coder") {
+    return {
+      headColor: "#7C3AED",
+      faceColor: "#4C1D95",
+      antennaColor: "#38BDF8",
+      earColor: "#5B21B6",
+      accentColor: "#C4B5FD",
+      eyeGlowColor: "#67E8F9",
+      role: "thinker",
+    };
+  }
+
+  if (id === "boti_star") {
+    return {
+      headColor: "#F59E0B",
+      faceColor: "#92400E",
+      antennaColor: "#FCD34D",
+      earColor: "#B45309",
+      accentColor: "#FDE68A",
+      eyeGlowColor: "#FEF08A",
+      role: "star",
+    };
+  }
+
+  // Default: boti_explorer / boti_default / any other
+  return {
+    headColor: "#0284C7",
+    faceColor: "#075985",
+    antennaColor: "#F0BE75",
+    earColor: "#0369A1",
+    accentColor: "#FDE047",
+    eyeGlowColor: "#38BDF8",
+    role: "explorer",
+  };
+}
 
 export function BotiAvatarIcon({
   avatarId,
@@ -53,61 +107,8 @@ export function BotiAvatarIcon({
   avatarId?: string;
   className?: string;
 }) {
-  const normalizedId = avatarId || "boti_default";
-
-  // Visual cues based on avatarId
-  const getTheme = () => {
-    switch (normalizedId) {
-      case "boti_explorer":
-        return {
-          headColor: "#38bdf8",
-          faceColor: "#0284c7",
-          antennaColor: "#f59e0b",
-          eyeColor: "#ffffff",
-          earColor: "#0369a1",
-          accessory: "explorer",
-        };
-      case "boti_coder":
-        return {
-          headColor: "#a855f7",
-          faceColor: "#7e22ce",
-          antennaColor: "#38bdf8",
-          eyeColor: "#ffffff",
-          earColor: "#6b21a8",
-          accessory: "coder",
-        };
-      case "boti_star":
-        return {
-          headColor: "#f59e0b",
-          faceColor: "#d97706",
-          antennaColor: "#ef4444",
-          eyeColor: "#ffffff",
-          earColor: "#b45309",
-          accessory: "star",
-        };
-      case "boti_leaf":
-        return {
-          headColor: "#10b981",
-          faceColor: "#059669",
-          antennaColor: "#84cc16",
-          eyeColor: "#ffffff",
-          earColor: "#047857",
-          accessory: "leaf",
-        };
-      case "boti_default":
-      default:
-        return {
-          headColor: "#10b981",
-          faceColor: "#047857",
-          antennaColor: "#facc15",
-          eyeColor: "#ffffff",
-          earColor: "#065f46",
-          accessory: "default",
-        };
-    }
-  };
-
-  const theme = getTheme();
+  const theme = getAvatarTheme(avatarId);
+  const normalizedId = avatarId || "boti_explorer";
 
   return (
     <svg
@@ -118,62 +119,115 @@ export function BotiAvatarIcon({
       role="img"
       aria-label={`Avatar ${normalizedId}`}
     >
-      {/* Background circle */}
-      <circle cx="50" cy="50" r="46" fill="#f8fafc" stroke="#e2e8f0" strokeWidth="3" />
+      {/* Background soft circle */}
+      <circle cx="50" cy="50" r="47" fill="#F7F4E9" stroke="#E5DFD1" strokeWidth="2.5" />
 
-      {/* Antenna Pole & Ball */}
-      <line x1="50" y1="28" x2="50" y2="15" stroke="#94a3b8" strokeWidth="4" strokeLinecap="round" />
-      <circle cx="50" cy="13" r="6" fill={theme.antennaColor} />
+      {/* Antenna Pole */}
+      <line x1="50" y1="28" x2="50" y2="15" stroke="#94A3B8" strokeWidth="3.5" strokeLinecap="round" />
 
-      {/* Robot Ears */}
-      <rect x="18" y="44" width="8" height="16" rx="4" fill={theme.earColor} />
-      <rect x="74" y="44" width="8" height="16" rx="4" fill={theme.earColor} />
+      {/* Role-specific Antenna Tip */}
+      {theme.role === "explorer" && (
+        <g>
+          <circle cx="50" cy="13" r="6" fill="#F0BE75" stroke="#D97706" strokeWidth="1.5" />
+          <polygon points="50,9 52,13 50,17 48,13" fill="#FFFFFF" />
+        </g>
+      )}
+      {theme.role === "guardian" && (
+        <path
+          d="M50 7 C44 11 46 17 50 17 C54 17 56 11 50 7 Z"
+          fill="#9DCEBC"
+          stroke="#3B7A57"
+          strokeWidth="1.5"
+        />
+      )}
+      {theme.role === "thinker" && (
+        <g>
+          <circle cx="50" cy="12" r="5" fill="#38BDF8" stroke="#0284C7" strokeWidth="1.5" />
+          <circle cx="50" cy="12" r="2" fill="#FFFFFF" />
+        </g>
+      )}
+      {theme.role === "star" && (
+        <path
+          d="M50 6 L52 11 L57 11 L53 14 L55 19 L50 16 L45 19 L47 14 L43 11 L48 11 Z"
+          fill="#FCD34D"
+          stroke="#D97706"
+          strokeWidth="1"
+        />
+      )}
 
-      {/* Robot Head Body */}
-      <rect x="24" y="28" width="52" height="46" rx="14" fill={theme.headColor} />
+      {/* Robot Side Ears / Audio Pods */}
+      <rect x="18" y="44" width="8" height="15" rx="4" fill={theme.earColor} />
+      <rect x="74" y="44" width="8" height="15" rx="4" fill={theme.earColor} />
 
-      {/* Face Screen */}
-      <rect x="30" y="34" width="40" height="32" rx="8" fill={theme.faceColor} />
+      {/* Robot Main Head Body */}
+      <rect x="24" y="27" width="52" height="46" rx="14" fill={theme.headColor} />
+
+      {/* Role-Specific Hat / Forehead Accent */}
+      {theme.role === "explorer" && (
+        <g>
+          {/* Aviator Goggles strap & lenses on forehead */}
+          <rect x="25" y="28" width="50" height="7" rx="3.5" fill="#78350F" opacity="0.8" />
+          <circle cx="41" cy="31.5" r="5" fill="#F0BE75" stroke="#78350F" strokeWidth="1.5" />
+          <circle cx="59" cy="31.5" r="5" fill="#F0BE75" stroke="#78350F" strokeWidth="1.5" />
+          <circle cx="41" cy="31.5" r="2" fill="#FEF3C7" />
+          <circle cx="59" cy="31.5" r="2" fill="#FEF3C7" />
+        </g>
+      )}
+
+      {/* Dark Visor Face Screen */}
+      <rect x="30" y="36" width="40" height="30" rx="8" fill={theme.faceColor} />
+
+      {/* Thinker Glasses / Spectacles */}
+      {theme.role === "thinker" && (
+        <g stroke="#67E8F9" strokeWidth="1.8" fill="none">
+          <rect x="34" y="42" width="13" height="11" rx="3" />
+          <rect x="53" y="42" width="13" height="11" rx="3" />
+          <line x1="47" y1="47" x2="53" y2="47" />
+        </g>
+      )}
 
       {/* Expressive Eyes */}
-      <ellipse cx="40" cy="48" rx="4" ry="6" fill={theme.eyeColor} />
-      <ellipse cx="60" cy="48" rx="4" ry="6" fill={theme.eyeColor} />
-      {/* Eye Pupils */}
-      <circle cx="41" cy="46" r="2" fill="#0f172a" />
-      <circle cx="61" cy="46" r="2" fill="#0f172a" />
+      <ellipse cx="40" cy="48" rx="4" ry="5.5" fill={theme.eyeGlowColor} />
+      <ellipse cx="60" cy="48" rx="4" ry="5.5" fill={theme.eyeGlowColor} />
 
-      {/* Cheerful Mouth / Smile */}
+      {/* Eye Pupils / Depth */}
+      <circle cx="41" cy="47" r="2" fill="#0F172A" />
+      <circle cx="61" cy="47" r="2" fill="#0F172A" />
+
+      {/* Eye Sparkle Highlights */}
+      <circle cx="42" cy="45.5" r="1.2" fill="#FFFFFF" />
+      <circle cx="62" cy="45.5" r="1.2" fill="#FFFFFF" />
+
+      {/* Cheerful Friendly Smile */}
       <path
-        d="M44 56 Q50 62 56 56"
-        stroke={theme.eyeColor}
-        strokeWidth="2.5"
+        d="M44 56.5 Q50 61.5 56 56.5"
+        stroke="#FFFFFF"
+        strokeWidth="2.2"
         strokeLinecap="round"
       />
 
-      {/* Cheeks */}
-      <circle cx="34" cy="54" r="2.5" fill="#f43f5e" opacity="0.6" />
-      <circle cx="66" cy="54" r="2.5" fill="#f43f5e" opacity="0.6" />
+      {/* Rosy Blush Cheeks */}
+      <circle cx="34" cy="54" r="2.5" fill="#F87171" opacity="0.6" />
+      <circle cx="66" cy="54" r="2.5" fill="#F87171" opacity="0.6" />
 
-      {/* Accessory Badges */}
-      {theme.accessory === "explorer" && (
-        <path d="M50 78 L53 84 L47 84 Z" fill="#f59e0b" />
-      )}
-      {theme.accessory === "star" && (
+      {/* Guardian Shield Emblem on chest */}
+      {theme.role === "guardian" && (
         <path
-          d="M50 75 L52 80 L57 80 L53 83 L55 88 L50 85 L45 88 L47 83 L43 80 L48 80 Z"
-          fill="#facc15"
-          stroke="#b45309"
+          d="M50 76 L55 79 L55 83 Q50 86 50 86 Q45 86 45 83 L45 79 Z"
+          fill="#9DCEBC"
+          stroke="#26443B"
+          strokeWidth="1"
+        />
+      )}
+
+      {/* Star Champion Emblem on chest */}
+      {theme.role === "star" && (
+        <path
+          d="M50 77 L51.5 80 L55 80 L52 82 L53 85 L50 83 L47 85 L48 82 L45 80 L48.5 80 Z"
+          fill="#FCD34D"
+          stroke="#B45309"
           strokeWidth="0.8"
         />
-      )}
-      {theme.accessory === "leaf" && (
-        <path
-          d="M47 85 C45 80 50 76 53 77 C55 81 52 85 47 85 Z"
-          fill="#84cc16"
-        />
-      )}
-      {theme.accessory === "coder" && (
-        <line x1="33" y1="48" x2="67" y2="48" stroke="#38bdf8" strokeWidth="1.5" strokeDasharray="2 2" />
       )}
     </svg>
   );

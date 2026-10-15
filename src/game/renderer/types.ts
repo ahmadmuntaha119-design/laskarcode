@@ -5,6 +5,7 @@ export type RenderOptions = {
   isColliding?: boolean;
   isGoal?: boolean;
   isMoving?: boolean;
+  avatarId?: string;
 };
 
 export type RendererDimensions = {

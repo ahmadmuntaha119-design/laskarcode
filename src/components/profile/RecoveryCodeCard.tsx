@@ -37,32 +37,32 @@ export function RecoveryCodeCard({
   };
 
   return (
-    <div className="w-full max-w-lg mx-auto bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-xl text-center">
+    <div className="w-full max-w-lg mx-auto bg-white rounded-3xl border-2 border-[#E8EDF5] p-6 sm:p-8 shadow-sm text-center">
       {/* Celebration Header */}
-      <div className="inline-flex items-center justify-center p-3 rounded-full bg-emerald-100 text-emerald-700 mb-4 animate-bounce">
-        <Sparkles className="w-8 h-8" />
+      <div className="inline-flex items-center justify-center p-3 rounded-full bg-[#12B886]/10 text-[#087F5B] mb-3">
+        <Sparkles className="w-7 h-7" />
       </div>
 
-      <div className="flex justify-center mb-4">
+      <div className="flex justify-center mb-3">
         <BotiAvatarIcon avatarId={avatarId} className="w-20 h-20" />
       </div>
 
-      <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
-        Selamat Bergabung, <span className="text-emerald-600">{nickname}</span>!
+      <h2 className="text-2xl sm:text-3xl font-black text-[#26334D]">
+        Selamat Bergabung, <span className="text-[#12B886]">{nickname}</span>!
       </h2>
-      <p className="mt-2 text-sm text-slate-600">
+      <p className="mt-2 text-sm text-[#64748B]">
         Profil petualangmu sudah siap. Sebelum melangkah, ini kunci rahasiamu:
       </p>
 
       {/* Recovery Code Box */}
-      <div className="mt-6 rounded-2xl border-2 border-dashed border-amber-300 bg-amber-50/70 p-5">
-        <span className="text-xs font-semibold uppercase tracking-wider text-amber-800 block mb-1">
+      <div className="mt-5 rounded-2xl border-2 border-dashed border-[#F59F00]/50 bg-[#FFD43B]/10 p-5">
+        <span className="text-xs font-bold uppercase tracking-wider text-[#B45309] block mb-1">
           Kode Petualangan Rahasia
         </span>
         <div className="my-2 flex items-center justify-center">
           <span
             id="text-recovery-code"
-            className="font-mono text-2xl sm:text-3xl font-black tracking-widest text-slate-900 select-all"
+            className="font-mono text-2xl sm:text-3xl font-black tracking-widest text-[#26334D] select-all"
           >
             {recoveryCode}
           </span>
@@ -72,12 +72,12 @@ export function RecoveryCodeCard({
           id="btn-copy-code"
           type="button"
           onClick={handleCopy}
-          className="mt-3 inline-flex items-center gap-2 rounded-xl bg-amber-200/80 px-4 py-2 text-xs font-bold text-amber-900 hover:bg-amber-300 transition-colors active:scale-95 cursor-pointer"
+          className="mt-3 inline-flex items-center gap-2 rounded-xl bg-[#FFD43B] px-4 py-2.5 text-xs font-bold text-[#78350F] shadow-[0_3px_0_#F59F00] hover:bg-[#fcc419] transition-all active:translate-y-0.5 active:shadow-none cursor-pointer min-h-11"
         >
           {copied ? (
             <>
-              <Check className="h-4 w-4 text-emerald-700 stroke-3" />
-              <span className="text-emerald-800">Tersalin ke Clipboard!</span>
+              <Check className="h-4 w-4 text-[#087F5B] stroke-3" />
+              <span className="text-[#087F5B]">Tersalin ke Clipboard!</span>
             </>
           ) : (
             <>
@@ -89,22 +89,22 @@ export function RecoveryCodeCard({
       </div>
 
       {/* Child-friendly Advisory Warning */}
-      <div className="mt-4 flex items-start gap-2.5 rounded-xl bg-slate-50 border border-slate-200 p-3.5 text-left">
-        <ShieldAlert className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
-        <p className="text-xs text-slate-600 leading-relaxed">
-          <strong>Catat atau simpan kode ini!</strong> Kamu bisa memakainya kapan saja untuk
+      <div className="mt-4 flex items-start gap-2.5 rounded-2xl bg-[#FFFDF7] border border-[#E8EDF5] p-3.5 text-left">
+        <ShieldAlert className="h-5 w-5 text-[#F59F00] shrink-0 mt-0.5" />
+        <p className="text-xs text-[#64748B] leading-relaxed">
+          <strong className="text-[#26334D]">Catat atau simpan kode ini ya!</strong> Kamu bisa memakainya kapan saja untuk
           melanjutkan petualangan jika membuka LaskarCode di komputer atau HP lain.
         </p>
       </div>
 
       {/* Primary Action Button to Adventure */}
-      <div className="mt-8">
+      <div className="mt-7">
         <Link
           id="btn-start-adventure"
-          href="/play"
-          className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-6 py-4 text-base font-bold text-white shadow-lg shadow-emerald-200 hover:bg-emerald-500 hover:shadow-emerald-300 transition-all active:scale-98"
+          href="/map"
+          className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#12B886] px-6 py-3.5 text-base font-bold text-white shadow-[0_5px_0_#087F5B] hover:bg-[#0fa678] transition-all active:translate-y-1 active:shadow-none min-h-13"
         >
-          <span>🚀 Siap, Menuju Petualangan!</span>
+          <span>Buka Peta Petualangan</span>
           <ArrowRight className="h-5 w-5" />
         </Link>
       </div>

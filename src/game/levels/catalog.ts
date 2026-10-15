@@ -286,6 +286,13 @@ export function getIslands(): readonly IslandDefinition[] {
 }
 
 /**
+ * Gets an island definition by slug or id (e.g. "desa-boti", "hutan-pola").
+ */
+export function getIslandBySlug(slug: string): IslandDefinition | undefined {
+  return ISLANDS.find((island) => island.slug === slug || island.id === slug);
+}
+
+/**
  * Gets next level in progression order, or null if this is the final level.
  */
 export function getNextLevel(currentCode: string): LevelDefinition | null {
